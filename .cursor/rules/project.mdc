@@ -55,4 +55,3 @@ This repository is a **microservices** system. Do not collapse it into a monolit
 - No empty placeholder folders. No TODOs instead of implementation. No permanent mocks where real behavior is required.
 - After each requirement, update `REQUIREMENTS_TRACEABILITY.md`.
 - Architectural changes must be justified against RF/RNF and documented. No silent redesign.
-

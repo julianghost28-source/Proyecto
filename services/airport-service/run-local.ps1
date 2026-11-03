@@ -14,4 +14,3 @@ try {
 finally {
     Remove-Item Env:PYTHONPATH -ErrorAction SilentlyContinue
 }
-

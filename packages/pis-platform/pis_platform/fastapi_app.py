@@ -65,4 +65,3 @@ def create_service_app(
         return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
     return app
-

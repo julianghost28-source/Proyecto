@@ -25,4 +25,3 @@ class CommonSettings(BaseSettings):
     itinerary_database_url: str = "sqlite+aiosqlite:///data/itinerary.db"
     notification_database_url: str = "sqlite+aiosqlite:///data/notification.db"
     otel_console: bool = False
-

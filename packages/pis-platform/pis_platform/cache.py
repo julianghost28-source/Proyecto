@@ -37,4 +37,3 @@ class MemoryTtlCache:
 
     def clear(self) -> None:
         self._store.clear()
-

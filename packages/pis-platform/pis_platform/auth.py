@@ -29,4 +29,3 @@ def decode_access_token(token: str, secret: str, algorithm: str) -> TokenPayload
         return TokenPayload.model_validate(data)
     except jwt.PyJWTError as exc:
         raise UnauthorizedError("Invalid or expired token") from exc
-

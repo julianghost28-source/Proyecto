@@ -61,4 +61,3 @@ Todas las peticiones de aplicación deben transportar `X-Correlation-ID` (Fase 6
 ## Respuesta a incidentes de desarrollo
 
 Si un secreto de desarrollo se filtra en un fork público, rotarlo en `.env` y no reutilizarlo. No hay secretos de producción en este repositorio.
-

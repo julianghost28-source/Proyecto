@@ -19,4 +19,3 @@ def make_session_factory(engine: AsyncEngine) -> async_sessionmaker[AsyncSession
 async def create_schema(engine: AsyncEngine, base: type[DeclarativeBase]) -> None:
     async with engine.begin() as conn:
         await conn.run_sync(base.metadata.create_all)
-

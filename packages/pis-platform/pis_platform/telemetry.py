@@ -16,4 +16,3 @@ def configure_telemetry(service_name: str, console: bool = False) -> None:
 
 def tracer(service_name: str):
     return trace.get_tracer(service_name)
-

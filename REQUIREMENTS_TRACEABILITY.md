@@ -70,4 +70,3 @@ Reanudar verificación en cuanto Docker Desktop esté instalado y el daemon acti
 | --- | --- | --- |
 | 1 | Compose, redes, volúmenes, health checks, observabilidad de plataforma | `docker compose ps` healthy + script de smoke |
 | 2–12 | Según prompt maestro | Código + tests + build + health + docs + esta matriz |
-

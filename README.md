@@ -161,4 +161,3 @@ docker compose up --build
 ```
 
 El stack de infraestructura debe quedar healthy sin instalaciones manuales de dependencias de runtime.
-

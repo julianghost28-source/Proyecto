@@ -128,4 +128,3 @@ def broker_url_from_path(path: str | Path) -> str:
     resolved = Path(path).resolve()
     resolved.parent.mkdir(parents=True, exist_ok=True)
     return f"sqlite+aiosqlite:///{resolved.as_posix()}"
-

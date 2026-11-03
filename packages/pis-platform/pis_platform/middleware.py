@@ -87,4 +87,3 @@ def register_exception_handlers(app: FastAPI) -> None:
             status_code=500,
             content=error_body("INTERNAL_ERROR", "Unexpected server error", get_correlation_id()),
         )
-

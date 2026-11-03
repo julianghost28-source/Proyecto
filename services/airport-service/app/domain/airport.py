@@ -25,4 +25,3 @@ class Airport:
             "latitude": self.latitude,
             "longitude": self.longitude,
         }
-

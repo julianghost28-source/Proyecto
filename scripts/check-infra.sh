@@ -51,4 +51,3 @@ echo "OK  RabbitMQ management HTTP"
 
 echo
 echo "Phase 1 infrastructure checks passed."
-

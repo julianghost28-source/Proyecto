@@ -36,4 +36,3 @@ def configure_logging(service: str, level: str = "INFO") -> None:
     root.addHandler(handler)
     root.setLevel(getattr(logging, level.upper(), logging.INFO))
     logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
-

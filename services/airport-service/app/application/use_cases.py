@@ -93,4 +93,3 @@ class GetAirportUseCase:
             await self._repository.upsert_many([remote])
             self._cache.set(key, remote.to_dict(), self._ttl)
             return remote
-

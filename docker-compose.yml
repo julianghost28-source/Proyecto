@@ -221,4 +221,3 @@ volumes:
   rabbitmq_data:
   prometheus_data:
   grafana_data:
-

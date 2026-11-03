@@ -82,4 +82,3 @@ Test-HttpOk -Name "RabbitMQ management" -Url "http://127.0.0.1:15672/api/health/
 
 Write-Host ""
 Write-Host "Phase 1 infrastructure checks passed."
-

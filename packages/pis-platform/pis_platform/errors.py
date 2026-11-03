@@ -51,4 +51,3 @@ def error_body(code: str, message: str, correlation_id: str | None) -> dict[str,
             "correlation_id": correlation_id,
         }
     }
-

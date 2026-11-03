@@ -18,4 +18,3 @@ def test_normalize_airport_swaps_reversed_coordinates_from_api_colombia():
     assert airport is not None
     assert airport.latitude == 6.166336066
     assert airport.longitude == -75.42037792
-

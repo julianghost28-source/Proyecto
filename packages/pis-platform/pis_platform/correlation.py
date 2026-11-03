@@ -36,4 +36,3 @@ def ensure_correlation_id(incoming: str | None) -> str:
     if not get_trace_id():
         set_trace_id(new_id())
     return value
-

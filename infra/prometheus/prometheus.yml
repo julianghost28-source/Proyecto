@@ -18,4 +18,3 @@ scrape_configs:
       - targets: ["otel-collector:8888"]
         labels:
           service: otel-collector
-

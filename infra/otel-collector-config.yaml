@@ -47,4 +47,3 @@ service:
       receivers: [otlp]
       processors: [memory_limiter, batch]
       exporters: [debug]
-
