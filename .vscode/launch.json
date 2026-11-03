@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Airport Service (local)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/services/airport-service/main.py",
+      "cwd": "${workspaceFolder}/services/airport-service",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/packages/pis-platform;${workspaceFolder}/services/airport-service",
+        "PORT": "8010"
+      }
+    }
+  ]
+}

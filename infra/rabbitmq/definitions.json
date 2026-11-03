@@ -1,0 +1,65 @@
+{
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "itinerary.events",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "itinerary.events.dlx",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "queues": [
+    {
+      "name": "notification.itinerary-created",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "itinerary.events.dlx",
+        "x-dead-letter-routing-key": "itinerary.created.dead"
+      }
+    },
+    {
+      "name": "notification.itinerary-created.dlq",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "itinerary.events",
+      "vhost": "/",
+      "destination": "notification.itinerary-created",
+      "destination_type": "queue",
+      "routing_key": "itinerary.created",
+      "arguments": {}
+    },
+    {
+      "source": "itinerary.events.dlx",
+      "vhost": "/",
+      "destination": "notification.itinerary-created.dlq",
+      "destination_type": "queue",
+      "routing_key": "itinerary.created.dead",
+      "arguments": {}
+    }
+  ]
+}
+

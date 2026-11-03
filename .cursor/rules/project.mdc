@@ -1,0 +1,58 @@
+---
+description: Architecture and delivery rules for the Personal Itinerary System
+alwaysApply: true
+---
+
+# Personal Itinerary System — project rules
+
+This repository is a **microservices** system. Do not collapse it into a monolith.
+
+## Required architecture
+
+- Hexagonal architecture per service: `domain`, `application`, `infrastructure`, `api`.
+- Domain-Driven Design: one bounded context per service, ubiquitous language, independent domain model.
+- Dependency injection through ports; adapters live in `infrastructure`.
+- Domain must not import FastAPI, SQLAlchemy, Redis, RabbitMQ, or the external API Colombia client.
+
+## Data independence (non-negotiable)
+
+- Airport Service → `postgres-airport` / `airport_db` only.
+- Itinerary Service → `postgres-itinerary` / `itinerary_db` only.
+- Notification Worker → `postgres-notification` / `notification_db` only.
+- Never query another service's database. Cross-context access is HTTP or events only.
+- Schema changes go through Alembic. Do not hand-edit tables as the normal workflow.
+
+## Integration rules
+
+- External airports: `AirportProvider` port → `ColombiaAirportApiAdapter`. Never call API Colombia from domain.
+- Redis is a cache with TTL and fallback, not the source of truth.
+- External HTTP calls must use timeout, retry, exponential backoff, jitter, and a circuit breaker (CLOSED / OPEN / HALF_OPEN).
+- Creating an itinerary publishes `ItineraryCreatedEvent` to RabbitMQ (`itinerary.events` / `itinerary.created`).
+- Notification worker consumes that event idempotently and stores history in its own database.
+
+## Gateway and frontend
+
+- API Gateway: routing, correlation ID, authn/z, error envelope, proxying. **No itinerary/airport domain logic.**
+- Frontend talks only to the Gateway. No direct database access.
+
+## Observability and errors
+
+- Structured logs: timestamp, service, level, message, correlation_id, trace_id.
+- Propagate `X-Correlation-ID` (use incoming value or generate one).
+- Uniform error body: `{ "error": { "code", "message", "correlation_id" } }`.
+- Instrument with OpenTelemetry. Export OTLP to `otel-collector`.
+
+## Security and portability
+
+- Secrets only from environment variables. Never commit production secrets.
+- `.env` is local development. Keep `.env.example` in sync without real credentials.
+- Every executable component must run via Docker Compose.
+- `docker compose up --build` must bring up the stack on a clean machine.
+
+## Delivery discipline
+
+- Work in the documented phases. Do not start Phase N+1 until Phase N is verified (tests, image build, process start, health, docs, traceability).
+- No empty placeholder folders. No TODOs instead of implementation. No permanent mocks where real behavior is required.
+- After each requirement, update `REQUIREMENTS_TRACEABILITY.md`.
+- Architectural changes must be justified against RF/RNF and documented. No silent redesign.
+
