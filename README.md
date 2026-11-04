@@ -79,9 +79,9 @@ cd services/airport-service
 
 La API quedará en:
 
-- http://127.0.0.1:8001
-- http://127.0.0.1:8001/health
-- http://127.0.0.1:8001/docs
+- http://127.0.0.0:8001
+- http://127.0.0.0:8001/health
+- http://127.0.0.0:8001/docs
 
 > Esto no desmonta Docker: solo te permite trabajar sin depender de él mientras lo dejamos en pausa o lo arreglamos después.
 
