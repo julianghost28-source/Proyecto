@@ -1,0 +1,54 @@
+asyncapi: 2.6.0
+info:
+  title: Personal Itinerary Integration Events
+  version: 1.0.0
+  description: Integration event contract published through RabbitMQ by the Itinerary Service.
+defaultContentType: application/json
+servers:
+  localRabbitMQ:
+    url: rabbitmq:5672
+    protocol: amqp
+    description: RabbitMQ inside the Docker Compose network
+channels:
+  itinerary.created:
+    description: Durable topic exchange `itinerary.events`, routing key `itinerary.created`.
+    publish:
+      operationId: publishItineraryCreated
+      message:
+        $ref: '#/components/messages/ItineraryCreatedEvent'
+components:
+  messages:
+    ItineraryCreatedEvent:
+      name: ItineraryCreatedEvent
+      title: Itinerary created
+      summary: Emitted after an itinerary and its outbox event commit in the same database transaction.
+      contentType: application/json
+      payload:
+        type: object
+        required: [event_id, event_type, version, occurred_at, data]
+        properties:
+          event_id:
+            type: string
+            format: uuid
+          event_type:
+            type: string
+            const: ItineraryCreatedEvent
+          version:
+            type: integer
+            const: 1
+          occurred_at:
+            type: string
+            format: date-time
+          correlation_id:
+            type: [string, 'null']
+          data:
+            type: object
+            required: [itinerary_id, user_name, origin_airport_id, destination_airport_id, travel_date, duration_minutes]
+            properties:
+              itinerary_id: { type: integer }
+              user_name: { type: string }
+              origin_airport_id: { type: integer }
+              destination_airport_id: { type: integer }
+              travel_date: { type: string, format: date }
+              duration_minutes: { type: integer, minimum: 1 }
+              purpose: { type: string, maxLength: 250 }

@@ -201,6 +201,15 @@ async def root() -> HTMLResponse:
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
             <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
             <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+            <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.3.0/dist/maplibre-gl.css" />
+            <script type="importmap">
+                {
+                    "imports": {
+                        "leaflet": "https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js",
+                        "maplibre-gl": "https://unpkg.com/maplibre-gl@6.3.0/dist/maplibre-gl.mjs"
+                    }
+                }
+            </script>
             <style>
                 :root {
                     --bg-1: #edf6ff;
@@ -1306,6 +1315,10 @@ async def root() -> HTMLResponse:
                         </div>
                         <form class="itinerary-form" id="itinerary-form">
                             <div class="field">
+                                <label for="user-name">Tu nombre</label>
+                                <input id="user-name" name="user_name" type="text" maxlength="120" value="Julian" required />
+                            </div>
+                            <div class="field">
                                 <label for="origin">Origen</label>
                                 <select id="origin" name="origin"></select>
                             </div>
@@ -1315,7 +1328,11 @@ async def root() -> HTMLResponse:
                             </div>
                             <div class="field date-field">
                                 <label for="date">Fecha</label>
-                                <input id="date" name="date" type="date" />
+                                <input id="date" name="date" type="date" required />
+                            </div>
+                            <div class="field">
+                                <label for="duration">Duración (minutos)</label>
+                                <input id="duration" name="duration_minutes" type="number" min="1" max="10080" value="90" required />
                             </div>
                             <div class="field">
                                 <label for="purpose">Motivo</label>
@@ -1403,20 +1420,18 @@ async def root() -> HTMLResponse:
                 </div>
             </div>
 
-            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-            <script>
+            <script type="module">
+                import * as L from 'leaflet';
+                import { maplibreGL } from 'https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.1.4/dist/leaflet-maplibre-gl.mjs';
+
                 const state = {
                     airports: [],
-                    itineraries: JSON.parse(localStorage.getItem('pis-itineraries') || '[]'),
+                    itineraries: [],
                     map: null,
                     markersLayer: null,
                     routeLayer: null,
                     editingId: null
                 };
-
-                function persistItineraries() {
-                    localStorage.setItem('pis-itineraries', JSON.stringify(state.itineraries));
-                }
 
                 function updateClock() {
                     const now = new Date();
@@ -1436,6 +1451,22 @@ async def root() -> HTMLResponse:
 
                 function getAirportById(id) {
                     return state.airports.find(a => Number(a.id) === Number(id));
+                }
+
+                function escapeHtml(value) {
+                    return String(value ?? '').replace(/[&<>"']/g, char => ({
+                        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                    })[char]);
+                }
+
+                async function apiRequest(url, options = {}) {
+                    const response = await fetch(url, options);
+                    if (response.status === 204) return null;
+                    const body = await response.json().catch(() => ({}));
+                    if (!response.ok) {
+                        throw new Error(body?.error?.message || body?.detail || `Error HTTP ${response.status}`);
+                    }
+                    return body;
                 }
 
                 function normalizeAirportCode(value) {
@@ -1512,9 +1543,8 @@ async def root() -> HTMLResponse:
                         maxZoom: 16
                     }).setView([4.5709, -74.2973], 6);
 
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        maxZoom: 18,
-                        attribution: '&copy; OpenStreetMap contributors'
+                    maplibreGL({
+                        style: 'https://tiles.openfreemap.org/styles/liberty'
                     }).addTo(map);
 
                     state.map = map;
@@ -1852,18 +1882,24 @@ async def root() -> HTMLResponse:
                         return;
                     }
 
-                    list.innerHTML = state.itineraries.map((item, index) => `
+                    list.innerHTML = state.itineraries.map(item => {
+                        const origin = getAirportById(item.origin_airport_id);
+                        const destination = getAirportById(item.destination_airport_id);
+                        const originLabel = origin ? `${airportDisplayCode(origin)} · ${origin.name}` : `Aeropuerto ${item.origin_airport_id}`;
+                        const destinationLabel = destination ? `${airportDisplayCode(destination)} · ${destination.name}` : `Aeropuerto ${item.destination_airport_id}`;
+                        return `
                         <div class="itinerary-item">
                             <div class="itinerary-copy">
-                                <span><strong>${item.origin}</strong> → <strong>${item.destination}</strong></span>
-                                <span class="itinerary-meta">${item.date || 'Sin fecha'} · ${item.purpose || 'Viaje'}</span>
+                                <span><strong>${escapeHtml(originLabel)}</strong> → <strong>${escapeHtml(destinationLabel)}</strong></span>
+                                <span class="itinerary-meta">${escapeHtml(item.travel_date)} · ${escapeHtml(item.user_name)} · ${escapeHtml(item.duration_minutes)} min${item.purpose ? ` · ${escapeHtml(item.purpose)}` : ''}</span>
                             </div>
                             <div style="display:flex; gap:8px;">
-                                <button type="button" class="delete-btn" data-index="${index}" style="background: rgba(235,106,85,0.12); color:#b84e3d; border-color: rgba(235,106,85,0.2);">Eliminar</button>
-                                <button type="button" class="edit-btn" data-index="${index}" style="border: 1px solid rgba(90,168,255,0.2); background: rgba(90,168,255,0.08); color: var(--text); padding: 8px 12px; border-radius: 10px; cursor:pointer; font-size:0.75rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;">Editar</button>
+                                <button type="button" class="delete-btn" data-id="${item.id}" style="background: rgba(235,106,85,0.12); color:#b84e3d; border-color: rgba(235,106,85,0.2);">Eliminar</button>
+                                <button type="button" class="edit-btn" data-id="${item.id}" style="border: 1px solid rgba(90,168,255,0.2); background: rgba(90,168,255,0.08); color: var(--text); padding: 8px 12px; border-radius: 10px; cursor:pointer; font-size:0.75rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;">Editar</button>
                             </div>
                         </div>
-                    `).join('');
+                    `;
+                    }).join('');
                 }
 
                 function populateFormForEdit(itinerary) {
@@ -1876,12 +1912,11 @@ async def root() -> HTMLResponse:
                     const submitButton = document.getElementById('submit-itinerary');
                     const cancelButton = document.getElementById('cancel-edit');
 
-                    const originAirport = state.airports.find(airport => (airport.iata_code || '').toUpperCase() === String(itinerary.origin || '').toUpperCase()) || state.airports.find(airport => airport.name === itinerary.origin);
-                    const destinationAirport = state.airports.find(airport => (airport.iata_code || '').toUpperCase() === String(itinerary.destination || '').toUpperCase()) || state.airports.find(airport => airport.name === itinerary.destination);
-
-                    if (originAirport) originSelect.value = String(originAirport.id);
-                    if (destinationAirport) destinationSelect.value = String(destinationAirport.id);
-                    dateInput.value = itinerary.date || '';
+                    originSelect.value = String(itinerary.origin_airport_id);
+                    destinationSelect.value = String(itinerary.destination_airport_id);
+                    dateInput.value = itinerary.travel_date || '';
+                    document.getElementById('user-name').value = itinerary.user_name || '';
+                    document.getElementById('duration').value = itinerary.duration_minutes || 90;
                     purposeInput.value = itinerary.purpose || '';
                     submitButton.textContent = 'Guardar cambios';
                     cancelButton.style.display = 'inline-block';
@@ -1898,61 +1933,82 @@ async def root() -> HTMLResponse:
 
                 document.getElementById('itinerary-form').addEventListener('submit', function (event) {
                     event.preventDefault();
-                    const originId = Number(document.getElementById('origin').value);
-                    const destinationId = Number(document.getElementById('destination').value);
-                    const origin = getAirportById(originId);
-                    const destination = getAirportById(destinationId);
-                    const date = document.getElementById('date').value;
-                    const purpose = document.getElementById('purpose').value.trim() || 'Viaje';
+                    (async () => {
+                        const originId = Number(document.getElementById('origin').value);
+                        const destinationId = Number(document.getElementById('destination').value);
+                        const origin = getAirportById(originId);
+                        const destination = getAirportById(destinationId);
+                        if (!origin || !destination) return;
+                        if (originId === destinationId) {
+                            window.alert('El origen y el destino deben ser diferentes.');
+                            return;
+                        }
 
-                    if (!origin || !destination) return;
-
-                    const itineraryPayload = {
-                        id: state.editingId || ((typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`),
-                        origin: normalizeAirportCode(origin.iata_code) || origin.name,
-                        destination: normalizeAirportCode(destination.iata_code) || destination.name,
-                        date: date || 'Fecha libre',
-                        purpose
-                    };
-
-                    if (state.editingId) {
-                        const idx = state.itineraries.findIndex(item => item.id === state.editingId);
-                        if (idx >= 0) state.itineraries[idx] = { ...state.itineraries[idx], ...itineraryPayload };
-                    } else {
-                        state.itineraries.unshift(itineraryPayload);
-                    }
-
-                    persistItineraries();
-                    resetFormMode();
-                    renderItineraries();
-                    updateRoute();
+                        const submitButton = document.getElementById('submit-itinerary');
+                        submitButton.disabled = true;
+                        const payload = {
+                            user_name: document.getElementById('user-name').value.trim(),
+                            origin_airport_id: originId,
+                            destination_airport_id: destinationId,
+                            travel_date: document.getElementById('date').value,
+                            duration_minutes: Number(document.getElementById('duration').value),
+                            purpose: document.getElementById('purpose').value.trim()
+                        };
+                        try {
+                            const isEditing = state.editingId !== null;
+                            await apiRequest(
+                                isEditing ? `/api/itineraries/${state.editingId}` : '/api/itineraries',
+                                {
+                                    method: isEditing ? 'PATCH' : 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(payload)
+                                }
+                            );
+                            await loadItineraries();
+                            document.getElementById('itinerary-form').reset();
+                            document.getElementById('user-name').value = 'Julian';
+                            document.getElementById('duration').value = '90';
+                            resetFormMode();
+                            updateRoute();
+                        } catch (error) {
+                            window.alert(`No se pudo guardar el itinerario: ${error.message}`);
+                        } finally {
+                            submitButton.disabled = false;
+                        }
+                    })();
                 });
 
                 document.getElementById('cancel-edit').addEventListener('click', function () {
                     resetFormMode();
-                    document.getElementById('purpose').value = '';
-                    document.getElementById('date').value = '';
+                    document.getElementById('itinerary-form').reset();
+                    document.getElementById('user-name').value = 'Julian';
+                    document.getElementById('duration').value = '90';
                 });
 
                 document.getElementById('itinerary-list').addEventListener('click', function (event) {
                     const button = event.target.closest('.delete-btn');
                     if (button) {
-                        const index = Number(button.dataset.index);
-                        if (!Number.isInteger(index) || index < 0) return;
-
-                        state.itineraries.splice(index, 1);
-                        persistItineraries();
-                        renderItineraries();
+                        const itineraryId = Number(button.dataset.id);
+                        if (!Number.isInteger(itineraryId) || itineraryId < 1) return;
+                        if (!window.confirm('¿Eliminar este itinerario?')) return;
+                        apiRequest(`/api/itineraries/${itineraryId}`, { method: 'DELETE' })
+                            .then(loadItineraries)
+                            .catch(error => window.alert(`No se pudo eliminar: ${error.message}`));
                         return;
                     }
 
                     const editButton = event.target.closest('.edit-btn');
                     if (!editButton) return;
 
-                    const index = Number(editButton.dataset.index);
-                    if (!Number.isInteger(index) || index < 0) return;
-                    populateFormForEdit(state.itineraries[index]);
+                    const itineraryId = Number(editButton.dataset.id);
+                    const itinerary = state.itineraries.find(item => Number(item.id) === itineraryId);
+                    if (itinerary) populateFormForEdit(itinerary);
                 });
+
+                async function loadItineraries() {
+                    state.itineraries = await apiRequest('/api/itineraries');
+                    renderItineraries();
+                }
 
                 document.getElementById('origin').addEventListener('change', updateRoute);
                 document.getElementById('destination').addEventListener('change', updateRoute);
@@ -1968,11 +2024,16 @@ async def root() -> HTMLResponse:
                         renderAirportsList(airports);
                         renderRecommendations();
                         populateSelectors(airports);
-                        renderItineraries();
                     } catch (error) {
                         setApiState(false);
                         document.getElementById('airport-count').textContent = 'API error';
                         renderMapFallback();
+                        return;
+                    }
+                    try {
+                        await loadItineraries();
+                    } catch (error) {
+                        document.getElementById('itinerary-list').innerHTML = '<div class="itinerary-item itinerary-empty"><div class="itinerary-copy"><strong>No se pudieron cargar los itinerarios</strong></div><span>Revisa que Itinerary Service esté disponible</span></div>';
                     }
                 }
 

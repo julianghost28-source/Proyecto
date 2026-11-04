@@ -28,6 +28,11 @@ class ConflictError(AppError):
         super().__init__(code=code, message=message, status_code=409)
 
 
+class ValidationError(AppError):
+    def __init__(self, code: str, message: str) -> None:
+        super().__init__(code=code, message=message, status_code=400)
+
+
 class UnauthorizedError(AppError):
     def __init__(self, message: str = "Authentication required") -> None:
         super().__init__(code="UNAUTHORIZED", message=message, status_code=401)

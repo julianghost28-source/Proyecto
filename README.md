@@ -4,11 +4,11 @@ Plataforma de microservicios para consultar aeropuertos colombianos, diseñar it
 
 ## Estado actual
 
-**Fase 1: archivos de infraestructura listos.** Los microservicios de aplicación se implementan a partir de la Fase 2, solo cuando este stack esté *healthy*.
+La infraestructura, el Airport Service y el Itinerary Service se ejecutan con Docker Compose. Itinerary valida los aeropuertos mediante HTTP, persiste itinerarios en PostgreSQL y tiene CRUD documentado con Swagger. La publicación de eventos está implementada con Outbox transaccional y RabbitMQ; Notification Service consume esos eventos y guarda un historial en su propia base de datos.
 
-**Bloqueo de verificación en esta máquina:** no hay Docker Engine ni Docker Compose en el PATH (`docker` no se reconoce). Tampoco está instalado Docker Desktop en `C:\Program Files\Docker`. Hasta que exista el motor, no se pueden ejecutar `docker compose config|build|up|ps` ni comprobar health checks reales.
+El mapa del Airport Service consume el modelo adaptado de aeropuertos y muestra sus ubicaciones. La interfaz de mapas usa Leaflet y OpenFreeMap.
 
-En esta fase el entorno local levanta:
+El entorno local incluye:
 
 | Componente | Rol | Persistencia / UI |
 | --- | --- | --- |
@@ -17,6 +17,10 @@ En esta fase el entorno local levanta:
 | `postgres-notification` | Base del bounded context Notificaciones | volumen `notification_pg_data` |
 | `redis` | Caché (Aeropuertos, Fase 2) | volumen `redis_data` |
 | `rabbitmq` | Broker de `ItineraryCreatedEvent` | UI `http://127.0.0.1:15672` |
+| `airport-service` | Adaptador REST de aeropuertos colombianos | API y Swagger `http://127.0.0.1:8010/docs` |
+| `itinerary-service` | CRUD, validación HTTP y Outbox transaccional | API y Swagger `http://127.0.0.1:8002/docs` |
+| `notification-service` | Consumidor de eventos e historial de notificaciones simuladas | API y Swagger `http://127.0.0.1:8003/docs` |
+| `gateway` | Entrada HTTP única con proxy y limitación básica de solicitudes | `http://127.0.0.1:8000` |
 | `jaeger` | Trazas | UI `http://127.0.0.1:16686` |
 | `otel-collector` | Recepción OTLP y exportación | interno |
 | `prometheus` | Métricas | `http://127.0.0.1:9090` |
@@ -24,7 +28,7 @@ En esta fase el entorno local levanta:
 
 Red Docker: `personal-itinerary-net`.
 
-## Arquitectura objetivo
+## Arquitectura actual y objetivo
 
 ```text
 Usuario → Frontend → API Gateway
@@ -33,9 +37,10 @@ Usuario → Frontend → API Gateway
                       │                    PostgreSQL airport_db
                       └─ Itinerary Service → PostgreSQL itinerary_db
                                              ↓ ItineraryCreatedEvent
+                                             ↓ (Outbox en la transacción)
                                            RabbitMQ
                                              ↓
-                                      Notification Worker
+                                      Notification Service
                                              ↓
                                       PostgreSQL notification_db
 
@@ -129,6 +134,8 @@ Definidas en `.env` / `.env.example`. Son valores **solo locales**, no de produc
 | DLX / DLQ | `itinerary.events.dlx` / `notification.itinerary-created.dlq` |
 
 Definición versionada en `infra/rabbitmq/definitions.json`.
+
+El contrato `ItineraryCreatedEvent` está documentado en [docs/asyncapi.yaml](docs/asyncapi.yaml). El Outbox se guarda en la misma transacción que el itinerario; el publicador reintenta si RabbitMQ no está disponible. Notification Service deduplica por `event_id` y registra una notificación simulada, sin enviar correos reales.
 
 ## Documentación relacionada
 

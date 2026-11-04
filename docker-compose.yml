@@ -1,10 +1,128 @@
 name: personal-itinerary-system
 
-# Fase 1 — infraestructura compartida.
-# Los microservicios se añaden en fases posteriores; cada uno usará su propia
-# persistencia y esta red. Las bases PostgreSQL no se publican en el host.
+# Infraestructura compartida y servicios de aplicación.
+# Cada servicio usa su propia persistencia dentro de la red; PostgreSQL no se
+# publica directamente en el host.
 
 services:
+  airport-service:
+    build:
+      context: .
+      dockerfile: services/airport-service/Dockerfile
+    container_name: pis-airport-service
+    restart: unless-stopped
+    environment:
+      PORT: "8010"
+    ports:
+      - "127.0.0.1:${AIRPORT_PORT:-8010}:8010"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8010/health', timeout=3)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - itinerary-net
+
+  itinerary-service:
+    build:
+      context: .
+      dockerfile: services/itinerary-service/Dockerfile
+    container_name: pis-itinerary-service
+    restart: unless-stopped
+    environment:
+      PORT: "8000"
+      ITINERARY_DATABASE_URL: postgresql+asyncpg://${ITINERARY_POSTGRES_USER}:${ITINERARY_POSTGRES_PASSWORD}@postgres-itinerary:5432/${ITINERARY_POSTGRES_DB}
+      AIRPORT_SERVICE_URL: http://airport-service:8010
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "127.0.0.1:${ITINERARY_PORT:-8002}:8000"
+    depends_on:
+      postgres-itinerary:
+        condition: service_healthy
+      airport-service:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - itinerary-net
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: services/notification-service/Dockerfile
+    container_name: pis-notification-service
+    restart: unless-stopped
+    environment:
+      NOTIFICATION_DATABASE_URL: postgresql+asyncpg://${NOTIFICATION_POSTGRES_USER}:${NOTIFICATION_POSTGRES_PASSWORD}@postgres-notification:5432/${NOTIFICATION_POSTGRES_DB}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      RABBITMQ_QUEUE: ${RABBITMQ_QUEUE:-notification.itinerary-created}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "127.0.0.1:${NOTIFICATION_PORT:-8003}:8000"
+    depends_on:
+      postgres-notification:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - itinerary-net
+
+  gateway:
+    image: nginx:1.27-alpine
+    container_name: pis-api-gateway
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${GATEWAY_PORT:-8000}:8000"
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      airport-service:
+        condition: service_healthy
+      itinerary-service:
+        condition: service_healthy
+      notification-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - itinerary-net
+
   postgres-airport:
     image: postgres:16-alpine
     container_name: pis-postgres-airport
