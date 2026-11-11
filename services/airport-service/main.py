@@ -1464,7 +1464,10 @@ async def root() -> HTMLResponse:
                     if (response.status === 204) return null;
                     const body = await response.json().catch(() => ({}));
                     if (!response.ok) {
-                        throw new Error(body?.error?.message || body?.detail || `Error HTTP ${response.status}`);
+                        const error = new Error(body?.error?.message || body?.detail || `Error HTTP ${response.status}`);
+                        error.status = response.status;
+                        error.code = body?.error?.code;
+                        throw error;
                     }
                     return body;
                 }
@@ -1954,8 +1957,8 @@ async def root() -> HTMLResponse:
                             duration_minutes: Number(document.getElementById('duration').value),
                             purpose: document.getElementById('purpose').value.trim()
                         };
+                        const isEditing = state.editingId !== null;
                         try {
-                            const isEditing = state.editingId !== null;
                             await apiRequest(
                                 isEditing ? `/api/itineraries/${state.editingId}` : '/api/itineraries',
                                 {
@@ -1971,7 +1974,21 @@ async def root() -> HTMLResponse:
                             resetFormMode();
                             updateRoute();
                         } catch (error) {
-                            window.alert(`No se pudo guardar el itinerario: ${error.message}`);
+                            if (isEditing && error.status === 404) {
+                                try {
+                                    await loadItineraries();
+                                } catch (_) {
+                                    // El formulario también debe salir del modo de edición si la lista no responde.
+                                }
+                                document.getElementById('itinerary-form').reset();
+                                document.getElementById('user-name').value = 'Julian';
+                                document.getElementById('duration').value = '90';
+                                resetFormMode();
+                                updateRoute();
+                                window.alert('Este itinerario ya no existe. Actualicé la lista; puedes crear uno nuevo.');
+                            } else {
+                                window.alert(`No se pudo guardar el itinerario: ${error.message}`);
+                            }
                         } finally {
                             submitButton.disabled = false;
                         }
