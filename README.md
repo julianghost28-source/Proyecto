@@ -47,74 +47,56 @@ Usuario → Frontend → API Gateway
 Observabilidad: OpenTelemetry → Collector → Jaeger / Prometheus → Grafana
 ```
 
-## Requisitos para clonar y ejecutar
+## Requisitos
 
-- **Docker Desktop** (Windows) o Docker Engine + Compose v2 (Linux/macOS)
-- (Opcional) Make, o PowerShell para `scripts/check-infra.ps1`
+- Docker Desktop en Windows, con el motor iniciado y WSL 2 habilitado; o Docker Engine con Docker Compose v2 en Linux/macOS.
+- Git para clonar el repositorio.
 
-En Windows, instala [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/), inicia la aplicación y confirma `docker version` en una terminal nueva. WSL 2 debe estar habilitado.
+Todos los servicios de la aplicación se ejecutan con Docker Compose. No es necesario instalar Python, PostgreSQL, Redis, RabbitMQ, Jaeger, Prometheus ni Grafana en el computador.
 
-No instales PostgreSQL, Redis, RabbitMQ, Jaeger, Prometheus ni Grafana en el host: van en Compose.
+## Iniciar el proyecto
 
-## Arranque
-
-### Opción A: desarrollo local sin Docker (recomendada mientras reparas el stack)
-
-Si quieres pausar Docker y seguir trabajando desde tu host, usa esta ruta local:
+En Windows, abre Docker Desktop y espera a que indique que está funcionando. Después, en PowerShell:
 
 ```powershell
-# desde la raíz del proyecto
-py -3 -m pip install -e packages/pis-platform
-py -3 -m pip install uvicorn
-cd services/airport-service
-py -3 main.py
-```
-
-O, en PowerShell:
-
-```powershell
-cd services/airport-service
-.\run-local.ps1
-```
-
-La API quedará en:
-
-- http://127.0.0.0:8001
-- http://127.0.0.0:8001/health
-- http://127.0.0.0:8001/docs
-
-> Esto no desmonta Docker: solo te permite trabajar sin depender de él mientras lo dejamos en pausa o lo arreglamos después.
-
-### Opción B: Docker (cuando el motor esté disponible)
-
-```bash
-cp .env.example .env   # en Windows: Copy-Item .env.example .env
-docker compose up --build -d
+git clone https://github.com/julianghost28-source/Proyecto.git
+cd Proyecto
+Copy-Item .env.example .env
+docker compose up -d --build
 docker compose ps
 ```
 
-En Windows (PowerShell):
+La primera vez, Docker descarga las imágenes y construye los servicios; puede tardar unos minutos. Cuando ya está instalado y no cambiaste el código, inicia el entorno con:
 
 ```powershell
-.\scripts\check-infra.ps1
+docker compose up -d
+docker compose ps
 ```
 
-En Unix:
+La aplicación principal queda en [http://localhost:8000](http://localhost:8000). Verifica que los servicios principales aparezcan como `healthy` en `docker compose ps` antes de usarla.
 
-```bash
-chmod +x scripts/check-infra.sh
-./scripts/check-infra.sh
+### Direcciones locales
+
+- Aplicación y Gateway: http://localhost:8000
+- API de aeropuertos: http://localhost:8010/docs
+- API de itinerarios: http://localhost:8002/docs
+- API de notificaciones: http://localhost:8003/docs
+- RabbitMQ Management: http://localhost:15672
+- Jaeger: http://localhost:16686
+- Prometheus: http://localhost:9090
+- Grafana: http://localhost:3000
+
+Las bases de datos y Redis se mantienen dentro de la red de Docker Compose; no se publican directamente al computador.
+
+### Detener el proyecto
+
+Para apagar los contenedores sin borrar los datos guardados:
+
+```powershell
+docker compose down
 ```
 
-Atajos (si tienes `make`):
-
-```bash
-make up
-make health
-make logs
-make down
-make clean   # elimina también volúmenes
-```
+Los datos se conservan en volúmenes de Docker. No uses `docker compose down -v` a menos que quieras borrar esos datos.
 
 ## Credenciales de desarrollo
 
