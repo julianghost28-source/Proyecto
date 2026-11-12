@@ -658,6 +658,51 @@ async def root() -> HTMLResponse:
                     letter-spacing: -0.04em;
                 }
 
+                .itineraries-section {
+                    margin-top: 24px;
+                    scroll-margin-top: 18px;
+                }
+
+                .itineraries-heading {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 16px;
+                    padding: 0 6px;
+                }
+
+                .itineraries-eyebrow {
+                    color: #3285c2;
+                    font-size: 0.64rem;
+                    font-weight: 800;
+                    letter-spacing: 0.16em;
+                    text-transform: uppercase;
+                }
+
+                .itineraries-heading h2 {
+                    margin: 5px 0 3px;
+                    color: #123b5d;
+                    font-size: clamp(1.25rem, 2vw, 1.75rem);
+                    letter-spacing: -0.04em;
+                }
+
+                .itineraries-heading p {
+                    margin: 0;
+                    color: #5b7691;
+                    font-size: 0.82rem;
+                }
+
+                .itinerary-count {
+                    flex-shrink: 0;
+                    padding: 9px 13px;
+                    border: 1px solid rgba(66, 142, 208, 0.2);
+                    border-radius: 999px;
+                    background: linear-gradient(135deg, #edf7ff, #dceeff);
+                    color: #155889;
+                    font-size: 0.72rem;
+                    font-weight: 800;
+                }
+
                 .airport-badge {
                     display: inline-flex;
                     align-items: center;
@@ -671,34 +716,6 @@ async def root() -> HTMLResponse:
                     letter-spacing: 0.12em;
                     text-transform: uppercase;
                     font-weight: 800;
-                }
-
-                .airport-grid {
-                    display: grid;
-                    grid-template-columns: repeat(4, minmax(180px, 1fr));
-                    gap: 18px;
-                    margin-top: 10px;
-                }
-
-                .airport-card {
-                    background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(238,246,255,0.96));
-                    border: 1px solid rgba(96, 152, 224, 0.18);
-                    border-radius: 20px;
-                    overflow: hidden;
-                    box-shadow: 0 16px 30px rgba(43, 93, 153, 0.1);
-                    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-                    cursor: pointer;
-                }
-
-                .airport-card:hover {
-                    transform: translateY(-2px);
-                    border-color: rgba(59, 146, 255, 0.28);
-                    box-shadow: 0 20px 36px rgba(39, 96, 167, 0.14);
-                }
-
-                .airport-card:focus-visible {
-                    outline: 3px solid rgba(89, 169, 255, 0.35);
-                    outline-offset: 3px;
                 }
 
                 .airport-modal {
@@ -993,51 +1010,6 @@ async def root() -> HTMLResponse:
                     50% { transform: translateY(-2px); }
                 }
 
-                .airport-visual {
-                    position: relative;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 100%;
-                    height: 136px;
-                    overflow: hidden;
-                    font-size: 2rem;
-                    background: linear-gradient(135deg, #dff2ff 0%, #bfdcff 38%, #8fbef9 100%);
-                }
-
-                .airport-visual::before {
-                    content: "";
-                    position: absolute;
-                    inset: 0;
-                    background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(21, 58, 98, 0.12));
-                    z-index: 1;
-                }
-
-                .airport-visual img {
-                    position: absolute;
-                    inset: 0;
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    object-position: center;
-                    display: block;
-                }
-
-                .airport-pin {
-                    position: relative;
-                    z-index: 1;
-                    width: 62px;
-                    height: 62px;
-                    border-radius: 50%;
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: rgba(11, 63, 108, 0.9);
-                    border: 1px solid rgba(255,255,255,0.24);
-                    color: #f8d27a;
-                    box-shadow: 0 14px 24px rgba(14, 84, 151, 0.2), 0 0 18px rgba(248, 210, 122, 0.25);
-                }
-
                 .airport-tooltip {
                     background: rgba(255,255,255,0.96);
                     border: 1px solid rgba(90, 161, 245, 0.25);
@@ -1049,93 +1021,212 @@ async def root() -> HTMLResponse:
                     letter-spacing: 0.02em;
                 }
 
-                .airport-info {
-                    padding: 14px 14px 16px;
-                }
-
-                .airport-code {
-                    display: inline-block;
-                    font-size: 0.68rem;
-                    letter-spacing: 0.14em;
-                    font-weight: 800;
-                    border-radius: 999px;
-                    background: rgba(89, 169, 255, 0.08);
-                    border: 1px solid rgba(86, 146, 214, 0.18);
-                    color: #134d77;
-                    padding: 6px 10px;
-                    text-transform: uppercase;
-                }
-
-                .airport-name {
-                    margin: 12px 0 0;
-                    font-size: 1rem;
-                    line-height: 1.35;
-                    color: #123b5d;
-                }
-
-                .airport-meta {
-                    margin-top: 8px;
-                    color: #4e6f8f;
-                    font-size: 0.8rem;
-                }
-
                 .itinerary-list {
-                    margin-top: 18px;
+                    margin-top: 12px;
                     display: grid;
-                    gap: 12px;
+                    grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr));
+                    gap: 16px;
                 }
 
                 .itinerary-item {
+                    position: relative;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 18px;
+                    min-width: 0;
+                    padding: 20px;
+                    border: 1px solid rgba(89, 153, 224, 0.22);
+                    border-radius: 22px;
+                    background: linear-gradient(145deg, rgba(255,255,255,0.98), rgba(232,243,255,0.96));
+                    color: var(--text);
+                    box-shadow: 0 14px 30px rgba(50, 94, 145, 0.1), inset 0 1px 0 rgba(255,255,255,0.9);
+                    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+                }
+
+                .itinerary-item:not(.itinerary-empty):hover {
+                    transform: translateY(-4px);
+                    border-color: rgba(45, 143, 233, 0.44);
+                    box-shadow: 0 20px 38px rgba(45, 108, 174, 0.17), inset 0 1px 0 rgba(255,255,255,0.95);
+                }
+
+                .itinerary-card-head,
+                .itinerary-card-footer,
+                .itinerary-actions,
+                .itinerary-details {
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                    gap: 14px;
-                    padding: 12px 16px;
-                    border: 1px solid var(--line);
-                    border-radius: 14px;
-                    background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(232,242,255,0.92));
-                    color: var(--text);
-                    box-shadow: 0 8px 22px rgba(50, 82, 120, 0.08);
+                    gap: 10px;
                 }
 
-                .itinerary-item strong {
-                    color: var(--text);
+                .itinerary-card-head {
+                    color: #426888;
+                    font-size: 0.72rem;
+                    font-weight: 700;
+                }
+
+                .itinerary-card-kind,
+                .itinerary-date,
+                .itinerary-chip {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 7px;
+                    border-radius: 999px;
+                    padding: 7px 10px;
+                }
+
+                .itinerary-card-kind {
+                    background: rgba(89, 169, 255, 0.1);
+                    color: #145585;
+                }
+
+                .itinerary-date {
+                    border: 1px solid rgba(91, 147, 205, 0.17);
+                    background: rgba(255,255,255,0.76);
+                    color: #4b6680;
+                }
+
+                .itinerary-route {
+                    display: grid;
+                    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+                    align-items: center;
+                    gap: 12px;
+                    padding: 18px 16px;
+                    border-radius: 17px;
+                    background: linear-gradient(110deg, rgba(220,239,255,0.72), rgba(255,255,255,0.86), rgba(222,244,250,0.72));
+                }
+
+                .itinerary-airport {
+                    min-width: 0;
+                }
+
+                .itinerary-airport-label {
+                    display: block;
+                    margin-bottom: 7px;
+                    color: #67839e;
+                    font-size: 0.62rem;
+                    font-weight: 800;
+                    letter-spacing: 0.14em;
+                    text-transform: uppercase;
+                }
+
+                .itinerary-airport-code {
+                    display: block;
+                    color: #0f4c81;
+                    font-size: clamp(1.1rem, 2vw, 1.4rem);
+                    font-weight: 800;
+                    letter-spacing: 0.04em;
+                }
+
+                .itinerary-airport-name {
+                    display: -webkit-box;
+                    overflow: hidden;
+                    margin-top: 4px;
+                    color: #294d6d;
+                    font-size: 0.76rem;
+                    line-height: 1.45;
+                    -webkit-box-orient: vertical;
+                    -webkit-line-clamp: 2;
+                }
+
+                .itinerary-route-arrow {
+                    display: grid;
+                    place-items: center;
+                    width: 38px;
+                    height: 38px;
+                    border: 1px solid rgba(65, 149, 219, 0.18);
+                    border-radius: 50%;
+                    background: #fff;
+                    color: #2785ce;
+                    font-size: 1.2rem;
+                    box-shadow: 0 6px 14px rgba(43, 117, 172, 0.1);
+                }
+
+                .itinerary-card-footer {
+                    align-items: flex-end;
+                }
+
+                .itinerary-details {
+                    justify-content: flex-start;
+                    flex-wrap: wrap;
+                }
+
+                .itinerary-chip {
+                    border: 1px solid rgba(83, 137, 190, 0.16);
+                    background: rgba(255,255,255,0.8);
+                    color: #486784;
+                    font-size: 0.7rem;
+                    font-weight: 600;
+                }
+
+                .itinerary-actions {
+                    flex-shrink: 0;
+                }
+
+                .itinerary-actions button {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 7px;
+                    min-height: 40px;
+                    padding: 9px 13px;
+                    border-radius: 12px;
+                    font-size: 0.68rem;
+                    letter-spacing: 0.06em;
+                    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+                }
+
+                .itinerary-actions button:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 9px 16px rgba(44, 90, 150, 0.14);
+                }
+
+                .itinerary-actions button:focus-visible {
+                    outline: 3px solid rgba(45, 143, 233, 0.3);
+                    outline-offset: 2px;
+                }
+
+                .edit-btn {
+                    border: 1px solid rgba(42, 128, 205, 0.24);
+                    background: linear-gradient(135deg, #eaf5ff, #d9ecff);
+                    color: #145585;
+                }
+
+                .itinerary-actions .delete-btn {
+                    border: 1px solid rgba(207, 83, 66, 0.22);
+                    background: linear-gradient(135deg, #fff1ef, #ffe1dc);
+                    color: #a84437;
+                    box-shadow: none;
                 }
 
                 .itinerary-empty {
                     border-color: rgba(89, 169, 255, 0.26);
                     background: linear-gradient(180deg, rgba(240,247,255,0.96), rgba(221,236,255,0.92));
+                    align-items: center;
+                    justify-content: center;
+                    min-height: 190px;
+                    text-align: center;
                 }
 
                 .itinerary-empty strong {
                     color: var(--text);
                 }
 
-                .itinerary-empty span:last-child {
+                .itinerary-empty p {
+                    max-width: 360px;
+                    margin: 0;
                     color: var(--muted);
                 }
 
-                .itinerary-copy {
+                .itinerary-empty-icon {
                     display: grid;
-                    gap: 4px;
-                }
-
-                .itinerary-meta {
-                    color: var(--muted);
-                    font-size: 0.8rem;
-                }
-
-                .delete-btn {
-                    border: 1px solid rgba(255, 123, 96, 0.36);
-                    background: rgba(255, 123, 96, 0.12);
-                    color: #ffd6ce;
-                    padding: 8px 12px;
-                    border-radius: 10px;
-                    cursor: pointer;
-                    font-size: 0.75rem;
-                    font-weight: 700;
-                    letter-spacing: 0.08em;
-                    text-transform: uppercase;
+                    place-items: center;
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 16px;
+                    background: rgba(89, 169, 255, 0.12);
+                    color: #145585;
+                    font-size: 1.35rem;
                 }
 
                 .taskbar {
@@ -1238,9 +1329,6 @@ async def root() -> HTMLResponse:
                         grid-template-columns: 1fr;
                     }
 
-                    .airport-grid {
-                        grid-template-columns: repeat(2, minmax(180px, 1fr));
-                    }
                 }
 
                 @media (max-width: 700px) {
@@ -1262,8 +1350,46 @@ async def root() -> HTMLResponse:
                         grid-template-columns: 1fr;
                     }
 
-                    .airport-grid {
-                        grid-template-columns: 1fr;
+                    .itineraries-heading {
+                        align-items: flex-start;
+                    }
+
+                    .itineraries-heading p {
+                        max-width: 250px;
+                    }
+
+                    .itinerary-item {
+                        padding: 15px;
+                    }
+
+                    .itinerary-route {
+                        gap: 8px;
+                        padding: 14px 10px;
+                    }
+
+                    .itinerary-route-arrow {
+                        width: 32px;
+                        height: 32px;
+                    }
+
+                    .itinerary-date {
+                        max-width: 48%;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+
+                    .itinerary-card-footer {
+                        align-items: stretch;
+                        flex-direction: column;
+                    }
+
+                    .itinerary-actions {
+                        width: 100%;
+                    }
+
+                    .itinerary-actions button {
+                        flex: 1;
                     }
 
                     .map-shell {
@@ -1347,13 +1473,17 @@ async def root() -> HTMLResponse:
 
                     <div class="route-summary" id="route-summary"></div>
 
-                    <div class="itinerary-list" id="itinerary-list"></div>
-
-                    <div class="airport-section-head" id="airport-section">
-                        <h2>Los más visitados</h2>
-                        <span class="airport-badge">Top Colombia</span>
-                    </div>
-                    <div class="airport-grid" id="airport-grid"></div>
+                    <section class="itineraries-section" id="itineraries-section" aria-labelledby="itineraries-title">
+                        <div class="itineraries-heading">
+                            <div>
+                                <span class="itineraries-eyebrow">Tus planes de viaje</span>
+                                <h2 id="itineraries-title">Mis itinerarios</h2>
+                                <p>Consulta tus rutas y administra cada viaje desde su tarjeta.</p>
+                            </div>
+                            <span class="itinerary-count" id="itinerary-count">0 viajes</span>
+                        </div>
+                        <div class="itinerary-list" id="itinerary-list"></div>
+                    </section>
 
                     <div class="recommendations">
                         <div class="airport-section-head">
@@ -1389,11 +1519,11 @@ async def root() -> HTMLResponse:
                     <div class="airport-modal" id="airport-modal" aria-hidden="true">
                         <div class="airport-modal-panel" role="dialog" aria-modal="true" aria-labelledby="airport-modal-title">
                             <div class="airport-modal-header">
-                                <h3 id="airport-modal-title">Aeropuerto</h3>
+                                <h3 id="airport-modal-title">Detalle de ruta</h3>
                                 <button type="button" class="airport-modal-close" data-close-airport-modal aria-label="Cerrar información">×</button>
                             </div>
                             <div class="airport-modal-body">
-                                <span class="airport-modal-tag" id="airport-modal-tag">Historia</span>
+                                <span class="airport-modal-tag" id="airport-modal-tag">Recomendación</span>
                                 <p id="airport-modal-text"></p>
                             </div>
                         </div>
@@ -1408,7 +1538,7 @@ async def root() -> HTMLResponse:
                         <span class="app-pill__icon">✈</span>
                         Inicio
                     </button>
-                    <button type="button" class="app-pill" data-scroll-target="airport-section">
+                    <button type="button" class="app-pill" data-scroll-target="itineraries-section">
                         <span class="app-pill__icon">✈</span>
                         Airport Service
                     </button>
@@ -1627,50 +1757,12 @@ async def root() -> HTMLResponse:
                     document.querySelectorAll('[data-scroll-target]').forEach((button) => {
                         button.addEventListener('click', () => {
                             const target = button.dataset.scrollTarget;
-                            const element = target === 'top' ? document.querySelector('.shell') : document.getElementById('airport-section');
+                            const element = target === 'top' ? document.querySelector('.shell') : document.getElementById(target);
                             if (element) {
                                 element.scrollIntoView({ behavior: 'smooth', block: 'start' });
                             }
                         });
                     });
-                }
-
-                function getAirportImage(airport) {
-                    const city = (airport.city || '').toLowerCase();
-                    const code = (airport.iata_code || airport.oaci_code || '').toUpperCase();
-
-                    const airportImages = {
-                        bog: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=900&q=80',
-                        mde: 'https://images.unsplash.com/photo-1529074963764-98f45c47344b?auto=format&fit=crop&w=900&q=80',
-                        cta: 'https://images.unsplash.com/photo-1517479149777-5f3b1511d5ad?auto=format&fit=crop&w=900&q=80',
-                        ctg: 'https://images.unsplash.com/photo-1503220317375-aaad61436b1b?auto=format&fit=crop&w=900&q=80',
-                        clo: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=900&q=80',
-                        baq: 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=900&q=80',
-                        medellin: 'https://images.unsplash.com/photo-1529074963764-98f45c47344b?auto=format&fit=crop&w=900&q=80',
-                        bogota: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=900&q=80',
-                        cartagena: 'https://images.unsplash.com/photo-1503220317375-aaad61436b1b?auto=format&fit=crop&w=900&q=80',
-                        cali: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=900&q=80',
-                        barranquilla: 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=900&q=80'
-                    };
-
-                    return airportImages[code.toLowerCase()] || airportImages[city] || 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=900&q=80';
-                }
-
-                function getAirportPopularity(airport) {
-                    const text = `${airport.name || ''} ${airport.city || ''} ${airport.department || ''}`.toLowerCase();
-                    const normalized = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-
-                    if (normalized.includes('dorado') || normalized.includes('bogota')) return 10000;
-                    if (normalized.includes('jose maria cordova') || normalized.includes('medellin')) return 9800;
-                    if (normalized.includes('rafael nunez') || normalized.includes('cartagena')) return 9600;
-                    if (normalized.includes('alfonso bonilla aragon') || normalized.includes('cali')) return 9400;
-                    if (normalized.includes('ernesto cortissoz') || normalized.includes('barranquilla')) return 9200;
-                    if (normalized.includes('pereira') || normalized.includes('armenia') || normalized.includes('manizales')) return 7000;
-                    if (normalized.includes('internacional') || normalized.includes('international')) return 6500;
-                    if (normalized.includes('cucuta') || normalized.includes('bucaramanga')) return 6000;
-                    if (normalized.includes('neiva') || normalized.includes('florencia') || normalized.includes('popayan')) return 5500;
-
-                    return 3000;
                 }
 
                 function renderRecommendations() {
@@ -1753,98 +1845,17 @@ async def root() -> HTMLResponse:
                             modal.setAttribute('aria-hidden', 'false');
                         });
                     });
-                }
 
-                function getAirportHistory(airport) {
-                    const name = (airport.name || 'Este aeropuerto').toLowerCase();
-                    const city = (airport.city || '').toLowerCase();
-
-                    if (name.includes('dorado') || city.includes('bogotá') || city.includes('bogota')) {
-                        return 'El Aeropuerto El Dorado de Bogotá es uno de los hubs más importantes de Colombia y del continente. Fue clave en la expansión de la aviación comercial del país y sigue conectando rutas regionales e internacionales con alta frecuencia.';
-                    }
-
-                    if (name.includes('rafael núñez') || name.includes('rafael nunez') || city.includes('cartagena')) {
-                        return 'El aeropuerto Rafael Núñez de Cartagena es un símbolo de la historia turística del Caribe colombiano. Su crecimiento estuvo ligado al auge del turismo, la conexión regional y la consolidación de Cartagena como destino internacional.';
-                    }
-
-                    if (name.includes('córdoba') || name.includes('cordoba') || city.includes('medellín') || city.includes('medellin')) {
-                        return 'El aeropuerto José María Córdova, cerca de Medellín, se convirtió en una de las principales puertas de entrada al eje cafetero y al país. Su desarrollo impulsó comercio, emprendimiento y movilidad regional durante décadas.';
-                    }
-
-                    if (name.includes('bonilla') || city.includes('cali')) {
-                        return 'El aeropuerto Alfonso Bonilla Aragón de Cali es un punto estratégico para la conectividad del suroccidente. Su historia refleja el crecimiento económico de la región y la importancia del valle del Cauca en el tráfico aéreo nacional.';
-                    }
-
-                    if (name.includes('cortissoz') || city.includes('barranquilla')) {
-                        return 'El aeropuerto Ernesto Cortissoz de Barranquilla ha sido pieza clave en la conectividad del Caribe colombiano. Desde su expansión, ha apoyado la logística, el turismo y la actividad comercial del litoral norte.';
-                    }
-
-                    if (city.includes('pereira') || city.includes('armenia') || city.includes('manizales')) {
-                        return 'Estos aeropuertos del eje cafetero representan la conectividad de una de las regiones más dinámicas del país, con fuerte vínculo entre turismo, negocios y movilidad regional.';
-                    }
-
-                    return `${airport.name || 'Este aeropuerto'} es una terminal importante para ${airport.city || 'la región'} y refleja la red de conectividad que sostiene el desarrollo de ${airport.department || 'el departamento'} en Colombia.`;
-                }
-
-                function openAirportModal(airport) {
-                    const modal = document.getElementById('airport-modal');
-                    const title = document.getElementById('airport-modal-title');
-                    const tag = document.getElementById('airport-modal-tag');
-                    const text = document.getElementById('airport-modal-text');
-
-                    title.textContent = airport.name;
-                    tag.textContent = airport.city || 'Aeropuerto';
-                    text.textContent = getAirportHistory(airport);
-                    modal.classList.add('is-open');
-                    modal.setAttribute('aria-hidden', 'false');
+                    document.querySelector('[data-close-airport-modal]')?.addEventListener('click', closeAirportModal);
+                    document.getElementById('airport-modal')?.addEventListener('click', (event) => {
+                        if (event.target === event.currentTarget) closeAirportModal();
+                    });
                 }
 
                 function closeAirportModal() {
                     const modal = document.getElementById('airport-modal');
                     modal.classList.remove('is-open');
                     modal.setAttribute('aria-hidden', 'true');
-                }
-
-                function renderAirportsList(airports) {
-                    const airportGrid = document.getElementById('airport-grid');
-                    const rankedAirports = [...airports].sort((a, b) => getAirportPopularity(b) - getAirportPopularity(a) || (a.name || '').localeCompare(b.name || '')).slice(0, 8);
-
-                    airportGrid.innerHTML = rankedAirports.map((airport) => {
-                        const imageUrl = getAirportImage(airport);
-                        const codeText = airportDisplayCode(airport);
-                        return `
-                            <article class="airport-card" data-airport-id="${airport.id}" tabindex="0" role="button" aria-label="Abrir información de ${airport.name}">
-                                <div class="airport-visual">
-                                    <img src="${imageUrl}" alt="${airport.name}" />
-                                    <span class="airport-pin">✈</span>
-                                </div>
-                                <div class="airport-info">
-                                    <span class="airport-code">${codeText}</span>
-                                    <h3 class="airport-name">${airport.name}</h3>
-                                    <div class="airport-meta">${airport.city || 'Ciudad'} · ${airport.department || 'Departamento'}</div>
-                                </div>
-                            </article>
-                        `;
-                    }).join('');
-
-                    airportGrid.querySelectorAll('.airport-card').forEach((card) => {
-                        const airportId = Number(card.dataset.airportId);
-                        const airport = state.airports.find((item) => Number(item.id) === airportId);
-                        if (!airport) return;
-
-                        card.addEventListener('click', () => openAirportModal(airport));
-                        card.addEventListener('keydown', (event) => {
-                            if (event.key === 'Enter' || event.key === ' ') {
-                                event.preventDefault();
-                                openAirportModal(airport);
-                            }
-                        });
-                    });
-
-                    document.querySelector('[data-close-airport-modal]')?.addEventListener('click', closeAirportModal);
-                    document.getElementById('airport-modal')?.addEventListener('click', (event) => {
-                        if (event.target === event.currentTarget) closeAirportModal();
-                    });
                 }
 
                 function populateSelectors(airports) {
@@ -1880,27 +1891,52 @@ async def root() -> HTMLResponse:
 
                 function renderItineraries() {
                     const list = document.getElementById('itinerary-list');
+                    const count = document.getElementById('itinerary-count');
+                    count.textContent = `${state.itineraries.length} ${state.itineraries.length === 1 ? 'viaje' : 'viajes'}`;
                     if (!state.itineraries.length) {
-                        list.innerHTML = '<div class="itinerary-item itinerary-empty"><div class="itinerary-copy"><strong>Sin itinerarios</strong></div><span>Agrega una ruta para comenzar</span></div>';
+                        list.innerHTML = '<div class="itinerary-item itinerary-empty"><span class="itinerary-empty-icon" aria-hidden="true">✈</span><strong>Aún no tienes itinerarios</strong><p>Completa el formulario de arriba y guarda tu primera ruta para verla aquí.</p></div>';
                         return;
                     }
 
                     list.innerHTML = state.itineraries.map(item => {
                         const origin = getAirportById(item.origin_airport_id);
                         const destination = getAirportById(item.destination_airport_id);
-                        const originLabel = origin ? `${airportDisplayCode(origin)} · ${origin.name}` : `Aeropuerto ${item.origin_airport_id}`;
-                        const destinationLabel = destination ? `${airportDisplayCode(destination)} · ${destination.name}` : `Aeropuerto ${item.destination_airport_id}`;
+                        const originCode = origin ? airportDisplayCode(origin) : `#${item.origin_airport_id}`;
+                        const destinationCode = destination ? airportDisplayCode(destination) : `#${item.destination_airport_id}`;
+                        const originName = origin?.name || `Aeropuerto ${item.origin_airport_id}`;
+                        const destinationName = destination?.name || `Aeropuerto ${item.destination_airport_id}`;
+                        const purposeChip = item.purpose ? `<span class="itinerary-chip">✦ ${escapeHtml(item.purpose)}</span>` : '';
                         return `
-                        <div class="itinerary-item">
-                            <div class="itinerary-copy">
-                                <span><strong>${escapeHtml(originLabel)}</strong> → <strong>${escapeHtml(destinationLabel)}</strong></span>
-                                <span class="itinerary-meta">${escapeHtml(item.travel_date)} · ${escapeHtml(item.user_name)} · ${escapeHtml(item.duration_minutes)} min${item.purpose ? ` · ${escapeHtml(item.purpose)}` : ''}</span>
+                        <article class="itinerary-item" data-itinerary-id="${item.id}">
+                            <div class="itinerary-card-head">
+                                <span class="itinerary-card-kind">✈ Viaje personal</span>
+                                <span class="itinerary-date">▦ ${escapeHtml(item.travel_date)}</span>
                             </div>
-                            <div style="display:flex; gap:8px;">
-                                <button type="button" class="delete-btn" data-id="${item.id}" style="background: rgba(235,106,85,0.12); color:#b84e3d; border-color: rgba(235,106,85,0.2);">Eliminar</button>
-                                <button type="button" class="edit-btn" data-id="${item.id}" style="border: 1px solid rgba(90,168,255,0.2); background: rgba(90,168,255,0.08); color: var(--text); padding: 8px 12px; border-radius: 10px; cursor:pointer; font-size:0.75rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;">Editar</button>
+                            <div class="itinerary-route">
+                                <div class="itinerary-airport">
+                                    <span class="itinerary-airport-label">Origen</span>
+                                    <strong class="itinerary-airport-code">${escapeHtml(originCode)}</strong>
+                                    <span class="itinerary-airport-name">${escapeHtml(originName)}</span>
+                                </div>
+                                <span class="itinerary-route-arrow" aria-label="hacia">→</span>
+                                <div class="itinerary-airport">
+                                    <span class="itinerary-airport-label">Destino</span>
+                                    <strong class="itinerary-airport-code">${escapeHtml(destinationCode)}</strong>
+                                    <span class="itinerary-airport-name">${escapeHtml(destinationName)}</span>
+                                </div>
                             </div>
-                        </div>
+                            <div class="itinerary-card-footer">
+                                <div class="itinerary-details">
+                                    <span class="itinerary-chip">◷ ${escapeHtml(item.duration_minutes)} min</span>
+                                    <span class="itinerary-chip">♙ ${escapeHtml(item.user_name)}</span>
+                                    ${purposeChip}
+                                </div>
+                                <div class="itinerary-actions">
+                                    <button type="button" class="edit-btn" data-id="${item.id}"><span aria-hidden="true">✎</span> Editar</button>
+                                    <button type="button" class="delete-btn" data-id="${item.id}"><span aria-hidden="true">×</span> Eliminar</button>
+                                </div>
+                            </div>
+                        </article>
                     `;
                     }).join('');
                 }
@@ -2038,7 +2074,6 @@ async def root() -> HTMLResponse:
                         state.airports = airports;
                         setApiState(true);
                         document.getElementById('airport-count').textContent = `${airports.length} registros`;
-                        renderAirportsList(airports);
                         renderRecommendations();
                         populateSelectors(airports);
                     } catch (error) {
@@ -2050,7 +2085,7 @@ async def root() -> HTMLResponse:
                     try {
                         await loadItineraries();
                     } catch (error) {
-                        document.getElementById('itinerary-list').innerHTML = '<div class="itinerary-item itinerary-empty"><div class="itinerary-copy"><strong>No se pudieron cargar los itinerarios</strong></div><span>Revisa que Itinerary Service esté disponible</span></div>';
+                        document.getElementById('itinerary-list').innerHTML = '<div class="itinerary-item itinerary-empty"><span class="itinerary-empty-icon" aria-hidden="true">!</span><strong>No se pudieron cargar tus itinerarios</strong><p>Revisa que Itinerary Service esté disponible e inténtalo de nuevo.</p></div>';
                     }
                 }
 
@@ -2091,3 +2126,4 @@ if __name__ == "__main__":
 
     port = int(os.getenv("PORT", str(DEFAULT_PORT)))
     uvicorn.run("main:app", host="127.0.0.1", port=port, reload=True)
+
