@@ -1396,96 +1396,1057 @@ async def root() -> HTMLResponse:
                         height: 430px;
                     }
                 }
+
+                :root {
+                    --accent-violet: #4825e8;
+                    --accent-violet-light: #eeeaff;
+                    --dashboard-bg: #f3f4ff;
+                }
+
+                html,
+                body {
+                    background: var(--dashboard-bg);
+                    color: #17213d;
+                }
+
+                .viewport {
+                    display: grid;
+                    grid-template-columns: 180px minmax(0, 1fr);
+                    align-items: stretch;
+                    width: 100%;
+                    max-width: none;
+                    min-height: 100vh;
+                    padding: 0;
+                    gap: 0;
+                }
+
+                .app-sidebar {
+                    position: sticky;
+                    top: 0;
+                    display: flex;
+                    flex-direction: column;
+                    width: 180px;
+                    height: 100vh;
+                    min-height: 620px;
+                    padding: 25px 14px 20px;
+                    overflow: hidden;
+                    color: #fff;
+                    background-color: #13254b;
+                    background-image: linear-gradient(180deg, rgba(14, 30, 65, 0.96) 0%, rgba(24, 48, 101, 0.93) 62%, rgba(43, 74, 151, 0.62) 100%), url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=700&q=80");
+                    background-repeat: no-repeat;
+                    background-position: center, center bottom;
+                    background-size: cover, auto 235px;
+                    border-right: 1px solid rgba(255, 255, 255, 0.1);
+                }
+
+                .sidebar-brand {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    min-height: 118px;
+                    padding: 0 8px 18px;
+                    border-bottom: 1px solid rgba(219, 234, 254, 0.22);
+                    color: #dce7ff;
+                    font-size: 0.78rem;
+                    line-height: 1.4;
+                }
+
+                .sidebar-brand-mark {
+                    display: flex;
+                    align-items: center;
+                    gap: 9px;
+                }
+
+                .sidebar-brand-mark span {
+                    color: #60a5fa;
+                    font-size: 1.65rem;
+                    transform: rotate(-18deg);
+                }
+
+                .sidebar-brand-mark strong {
+                    color: #fff;
+                    font-size: 1.8rem;
+                    letter-spacing: 0.02em;
+                }
+
+                .sidebar-nav {
+                    display: grid;
+                    gap: 8px;
+                    padding-top: 16px;
+                }
+
+                .sidebar-link {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    min-height: 42px;
+                    padding: 9px 11px;
+                    border: 0;
+                    border-radius: 11px;
+                    background: transparent;
+                    color: #e4ecff;
+                    box-shadow: none;
+                    font-size: 0.82rem;
+                    font-weight: 600;
+                    text-align: left;
+                    cursor: pointer;
+                }
+
+                .sidebar-link:hover,
+                .sidebar-link.is-active {
+                    background: linear-gradient(105deg, #315af0, #813cf2);
+                    color: #fff;
+                    box-shadow: 0 8px 18px rgba(30, 36, 117, 0.26);
+                    transform: translateY(-1px);
+                }
+
+                .sidebar-icon {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 20px;
+                    color: inherit;
+                    font-size: 1rem;
+                }
+
+                .sidebar-link.is-disabled {
+                    opacity: 0.78;
+                    cursor: default;
+                }
+
+                .sidebar-link.is-disabled:hover {
+                    background: transparent;
+                    box-shadow: none;
+                    transform: none;
+                }
+
+                .sidebar-caption {
+                    margin-top: auto;
+                    padding: 14px 8px 0;
+                    border-top: 1px solid rgba(219, 234, 254, 0.22);
+                    color: #bdc9eb;
+                    font-size: 0.58rem;
+                    font-weight: 700;
+                    letter-spacing: 0.12em;
+                }
+
+                .shell {
+                    min-width: 0;
+                    max-width: none;
+                    min-height: 100vh;
+                    padding: 0 12px 24px;
+                    overflow: hidden;
+                    border: 0;
+                    border-radius: 0;
+                    background: var(--dashboard-bg);
+                    box-shadow: none;
+                }
+
+                .topbar {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 18px;
+                    min-height: 98px;
+                    margin: 0;
+                    padding: 14px 8px 12px;
+                    border: 0;
+                    background: transparent;
+                }
+
+                .title-wrap {
+                    min-width: 220px;
+                }
+
+                .eyebrow {
+                    margin-bottom: 3px;
+                    color: var(--accent-violet);
+                    font-size: 0.64rem;
+                    letter-spacing: 0.14em;
+                }
+
+                .topbar h1 {
+                    margin: 0;
+                    color: #111a38;
+                    font-size: clamp(1.3rem, 2.1vw, 1.8rem);
+                    line-height: 1.12;
+                    letter-spacing: -0.035em;
+                }
+
+                .subtitle {
+                    margin-top: 4px;
+                    color: #52617e;
+                    font-size: 0.78rem;
+                    letter-spacing: 0;
+                }
+
+                .topbar-status {
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-end;
+                    gap: 10px;
+                }
+
+                .badge,
+                .signal-box {
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-start;
+                    gap: 9px;
+                    min-width: 150px;
+                    height: 56px;
+                    padding: 8px 12px;
+                    border: 1px solid rgba(224, 228, 245, 0.9);
+                    border-radius: 999px;
+                    background: rgba(255, 255, 255, 0.9);
+                    color: #17213d;
+                    box-shadow: 0 5px 16px rgba(31, 41, 90, 0.08);
+                    font-size: 0.73rem;
+                    font-weight: 700;
+                    letter-spacing: 0;
+                    text-transform: none;
+                }
+
+                .badge .plane,
+                .signal-symbol {
+                    display: inline-flex;
+                    flex: 0 0 28px;
+                    align-items: center;
+                    justify-content: center;
+                    width: 28px;
+                    height: 28px;
+                    border: 0;
+                    border-radius: 50%;
+                    background: #e5fff5;
+                    color: #10b981;
+                    box-shadow: none;
+                    font-size: 0.9rem;
+                }
+
+                .badge small,
+                .signal-copy small {
+                    display: block;
+                    margin-top: 2px;
+                    color: #16a34a;
+                    font-size: 0.62rem;
+                    font-weight: 600;
+                }
+
+                .signal-box {
+                    min-width: 164px;
+                }
+
+                .signal-symbol {
+                    background: #eaf0ff;
+                    color: #3478ed;
+                }
+
+                .signal-copy {
+                    flex: 1;
+                    white-space: nowrap;
+                }
+
+                .signal-dot {
+                    flex: 0 0 9px;
+                    width: 9px;
+                    height: 9px;
+                    background: #16a34a;
+                    box-shadow: none;
+                }
+
+                .clock {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    min-width: 174px;
+                    min-height: 56px;
+                    padding: 8px 14px;
+                    border: 0;
+                    border-radius: 999px;
+                    background: linear-gradient(110deg, #304c9a, #172c69);
+                    color: #fff;
+                    text-align: left;
+                    box-shadow: 0 7px 18px rgba(41, 57, 134, 0.2);
+                }
+
+                .clock-symbol {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 34px;
+                    height: 34px;
+                    border: 1px solid rgba(255, 255, 255, 0.28);
+                    border-radius: 50%;
+                    background: rgba(140, 171, 255, 0.2);
+                    color: #d8e5ff;
+                    font-size: 1.25rem;
+                }
+
+                .clock-copy {
+                    display: grid;
+                    gap: 1px;
+                }
+
+                .clock-time {
+                    color: #fff;
+                    font-size: 1.15rem;
+                    font-weight: 800;
+                    letter-spacing: 0.02em;
+                    line-height: 1.15;
+                    text-shadow: none;
+                }
+
+                .clock-date {
+                    margin: 0;
+                    color: #d9e3ff;
+                    font-size: 0.64rem;
+                    font-weight: 500;
+                    letter-spacing: 0;
+                }
+
+                .content-grid {
+                    display: grid;
+                    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+                    gap: 16px;
+                    align-items: stretch;
+                    padding: 0;
+                }
+
+                .map-panel,
+                .form-panel,
+                .route-panel,
+                .itineraries-section,
+                .airport-section,
+                .recommendations {
+                    min-width: 0;
+                    overflow: hidden;
+                    border: 1px solid #e4e7f5;
+                    border-radius: 16px;
+                    background: linear-gradient(145deg, #fff, #f8f8ff);
+                    box-shadow: 0 8px 22px rgba(38, 48, 109, 0.07);
+                }
+
+                .map-panel,
+                .form-panel {
+                    margin: 0;
+                }
+
+                .panel-header,
+                .form-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    min-height: 50px;
+                    padding: 10px 14px;
+                    border: 0;
+                    border-bottom: 1px solid #eff0fa;
+                    background: rgba(255, 255, 255, 0.62);
+                    color: #14203f;
+                    font-size: 0.88rem;
+                    font-weight: 800;
+                    letter-spacing: 0;
+                    text-transform: none;
+                }
+
+                .panel-title {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                .heading-icon {
+                    color: var(--accent-violet);
+                    font-size: 1rem;
+                    font-weight: 800;
+                }
+
+                .kpi,
+                .airport-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 6px 10px;
+                    border: 1px solid #e6e2ff;
+                    border-radius: 999px;
+                    background: var(--accent-violet-light);
+                    color: var(--accent-violet);
+                    font-size: 0.65rem;
+                    font-weight: 800;
+                    letter-spacing: 0;
+                    white-space: nowrap;
+                }
+
+                .map-shell {
+                    height: 274px;
+                    margin: 0;
+                    border: 0;
+                    border-radius: 0 0 15px 15px;
+                    background: #dce7f2;
+                    box-shadow: none;
+                }
+
+                #map {
+                    filter: saturate(1.04) contrast(1.01);
+                }
+
+                .form-panel {
+                    display: flex;
+                    flex-direction: column;
+                    background: linear-gradient(145deg, #fff, #f2f1ff);
+                }
+
+                .form-header {
+                    min-height: 50px;
+                    background: transparent;
+                }
+
+                #route-status {
+                    max-width: 50%;
+                    overflow: hidden;
+                    padding: 5px 9px;
+                    border-radius: 999px;
+                    background: var(--accent-violet-light);
+                    color: var(--accent-violet);
+                    font-size: 0.64rem;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                .itinerary-form {
+                    display: grid;
+                    grid-template-columns: repeat(6, minmax(0, 1fr));
+                    align-content: start;
+                    gap: 9px 10px;
+                    padding: 10px 14px 14px;
+                    background: transparent;
+                }
+
+                .itinerary-form .field:first-child {
+                    grid-column: 1 / -1;
+                }
+
+                .itinerary-form .field:nth-child(2),
+                .itinerary-form .field:nth-child(3) {
+                    grid-column: span 3;
+                }
+
+                .itinerary-form .field:nth-child(4),
+                .itinerary-form .field:nth-child(5),
+                .itinerary-form .field:nth-child(6) {
+                    grid-column: span 2;
+                }
+
+                .field {
+                    gap: 4px;
+                    min-width: 0;
+                }
+
+                .field.full {
+                    grid-column: 1 / -1;
+                }
+
+                label {
+                    color: #34415f;
+                    font-size: 0.66rem;
+                    font-weight: 700;
+                    letter-spacing: 0;
+                    text-transform: none;
+                }
+
+                select,
+                input {
+                    min-width: 0;
+                    min-height: 35px;
+                    padding: 7px 10px;
+                    border: 1px solid #d8d8f5;
+                    border-radius: 9px;
+                    background: rgba(255, 255, 255, 0.78);
+                    color: #1c2745;
+                    font-size: 0.72rem;
+                    box-shadow: none;
+                }
+
+                .date-field input[type="date"] {
+                    min-height: 35px;
+                    padding: 7px 8px;
+                    font-size: 0.68rem;
+                }
+
+                select:focus,
+                input:focus {
+                    border-color: #8062f1;
+                    box-shadow: 0 0 0 3px rgba(110, 75, 235, 0.12);
+                }
+
+                #submit-itinerary {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    width: 100%;
+                    min-height: 38px;
+                    padding: 8px 14px;
+                    border: 0;
+                    border-radius: 999px;
+                    background: linear-gradient(100deg, #874cf1, #3514cb);
+                    color: #fff;
+                    font-size: 0.74rem;
+                    font-weight: 800;
+                    letter-spacing: 0;
+                    text-transform: none;
+                    box-shadow: 0 7px 16px rgba(77, 42, 206, 0.2);
+                }
+
+                #submit-itinerary:hover {
+                    background: linear-gradient(100deg, #7540e2, #2910b3);
+                }
+
+                .button-plane {
+                    font-size: 0.95rem;
+                }
+
+                .route-itinerary-grid {
+                    display: grid;
+                    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.2fr);
+                    gap: 16px;
+                    margin-top: 16px;
+                }
+
+                .route-panel,
+                .itineraries-section {
+                    margin: 0;
+                    padding: 0;
+                }
+
+                .section-title {
+                    display: flex;
+                    align-items: center;
+                    gap: 9px;
+                    min-height: 46px;
+                    padding: 10px 14px;
+                    color: #14203f;
+                    font-size: 0.85rem;
+                    font-weight: 800;
+                }
+
+                .route-summary {
+                    display: grid;
+                    grid-template-columns: minmax(0, 1.2fr) minmax(72px, 0.62fr) minmax(90px, 0.82fr);
+                    gap: 0;
+                    margin: 0;
+                    padding: 0 10px 8px;
+                }
+
+                .route-pill {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    min-width: 0;
+                    min-height: 88px;
+                    padding: 10px 11px;
+                    border: 0;
+                    border-right: 1px solid #e9e9f4;
+                    border-radius: 0;
+                    background: transparent;
+                    box-shadow: none;
+                }
+
+                .route-pill:last-child {
+                    border-right: 0;
+                }
+
+                .route-pill-label {
+                    margin-bottom: 4px;
+                    color: #687694;
+                    font-size: 0.63rem;
+                    letter-spacing: 0;
+                }
+
+                .route-pill-value {
+                    overflow-wrap: anywhere;
+                    color: #101a37;
+                    font-size: 0.72rem;
+                    line-height: 1.25;
+                }
+
+                .route-pill:first-child .route-pill-value {
+                    color: #101a37;
+                    font-size: clamp(1.1rem, 1.8vw, 1.6rem);
+                    font-weight: 800;
+                    white-space: nowrap;
+                }
+
+                .itineraries-heading {
+                    min-height: 46px;
+                    padding: 8px 14px;
+                }
+
+                .itineraries-heading h2 {
+                    margin: 0;
+                    color: #14203f;
+                    font-size: 0.85rem;
+                    letter-spacing: 0;
+                }
+
+                .itineraries-eyebrow,
+                .itineraries-heading p {
+                    display: none;
+                }
+
+                .itinerary-count {
+                    padding: 6px 10px;
+                    border: 1px solid #e6e2ff;
+                    background: var(--accent-violet-light);
+                    color: var(--accent-violet);
+                    font-size: 0.65rem;
+                }
+
+                .itinerary-list {
+                    margin: 0;
+                    padding: 0 12px 8px;
+                    gap: 0;
+                    border: 0;
+                    border-radius: 0;
+                    background: transparent;
+                    box-shadow: none;
+                }
+
+                .itinerary-item {
+                    padding: 9px 4px;
+                    border: 0;
+                    border-bottom: 1px solid #eeeff7;
+                    border-radius: 0;
+                    background: transparent;
+                    box-shadow: none;
+                }
+
+                .itinerary-item:last-child {
+                    border-bottom: 0;
+                }
+
+                .itinerary-route {
+                    padding: 8px 10px;
+                    border-radius: 10px;
+                    background: #f6f7ff;
+                }
+
+                .itinerary-airport-code,
+                .itinerary-route-arrow {
+                    color: var(--accent-violet);
+                }
+
+                .itinerary-actions button {
+                    min-height: 34px;
+                    padding: 7px 10px;
+                    border-radius: 999px;
+                    letter-spacing: 0;
+                    text-transform: none;
+                }
+
+                .airport-section {
+                    margin-top: 16px;
+                    padding: 0 0 10px;
+                }
+
+                .airport-section-head {
+                    min-height: 46px;
+                    margin: 0;
+                    padding: 8px 14px;
+                }
+
+                .airport-section-head h2 {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    color: #14203f;
+                    font-size: 0.9rem;
+                }
+
+                .airport-grid {
+                    display: grid;
+                    grid-template-columns: repeat(4, minmax(0, 1fr));
+                    gap: 12px;
+                    padding: 0 10px;
+                }
+
+                .airport-card {
+                    overflow: hidden;
+                    border: 1px solid #e5e8f4;
+                    border-radius: 13px;
+                    background: #fff;
+                    box-shadow: 0 5px 13px rgba(31, 41, 90, 0.08);
+                }
+
+                .airport-visual {
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-end;
+                    height: 82px;
+                    padding: 10px;
+                    background: linear-gradient(135deg, #4b7edb, #b5cafa);
+                    color: rgba(255, 255, 255, 0.9);
+                    font-size: 1.6rem;
+                }
+
+                .airport-card:nth-child(4n + 2) .airport-visual {
+                    background: linear-gradient(135deg, #e69b57, #f4d18e);
+                }
+
+                .airport-card:nth-child(4n + 3) .airport-visual {
+                    background: linear-gradient(135deg, #3f8090, #9bd1c0);
+                }
+
+                .airport-card:nth-child(4n + 4) .airport-visual {
+                    background: linear-gradient(135deg, #6e6db1, #c0b9ed);
+                }
+
+                .airport-info {
+                    position: relative;
+                    min-height: 68px;
+                    padding: 8px 11px 10px;
+                }
+
+                .airport-code {
+                    position: absolute;
+                    top: -15px;
+                    left: 10px;
+                    padding: 4px 8px;
+                    border: 0;
+                    border-radius: 999px;
+                    background: var(--accent-violet);
+                    color: #fff;
+                    font-size: 0.58rem;
+                    font-weight: 800;
+                }
+
+                .airport-name {
+                    margin: 2px 0 0;
+                    color: #17213d;
+                    font-size: 0.72rem;
+                    line-height: 1.3;
+                }
+
+                .airport-meta {
+                    margin-top: 3px;
+                    color: #687694;
+                    font-size: 0.63rem;
+                }
+
+                .recommendations {
+                    margin: 16px 0 0;
+                    padding: 4px 0 14px;
+                }
+
+                .recommendations .airport-section-head {
+                    margin: 0;
+                }
+
+                .recommendation-hero,
+                .recommendation-grid {
+                    padding: 0 10px;
+                }
+
+                .airport-modal {
+                    z-index: 3000;
+                }
+
+                .taskbar {
+                    display: none;
+                }
+
+                @media (prefers-reduced-motion: reduce) {
+                    *,
+                    *::before,
+                    *::after {
+                        scroll-behavior: auto !important;
+                        transition-duration: 0.01ms !important;
+                        animation-duration: 0.01ms !important;
+                        animation-iteration-count: 1 !important;
+                    }
+                }
+
+                @media (max-width: 1100px) {
+                    .viewport {
+                        grid-template-columns: 156px minmax(0, 1fr);
+                    }
+
+                    .app-sidebar {
+                        width: 156px;
+                    }
+
+                    .topbar {
+                        align-items: flex-start;
+                        flex-direction: column;
+                        gap: 10px;
+                        padding: 14px 4px 12px;
+                    }
+
+                    .topbar-status {
+                        width: 100%;
+                        justify-content: flex-start;
+                    }
+
+                    .badge,
+                    .signal-box,
+                    .clock {
+                        min-width: 0;
+                    }
+
+                    .content-grid {
+                        grid-template-columns: minmax(0, 1fr);
+                    }
+
+                    .map-shell {
+                        height: 300px;
+                    }
+
+                    .itinerary-form {
+                        grid-template-columns: repeat(6, minmax(0, 1fr));
+                    }
+                }
+
+                @media (max-width: 760px) {
+                    .viewport {
+                        display: block;
+                    }
+
+                    .app-sidebar {
+                        display: none;
+                    }
+
+                    .shell {
+                        min-height: 100vh;
+                        padding: 0 10px 20px;
+                    }
+
+                    .topbar {
+                        min-height: 0;
+                        padding: 14px 2px;
+                    }
+
+                    .topbar-status {
+                        display: grid;
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                    }
+
+                    .badge,
+                    .signal-box,
+                    .clock {
+                        width: 100%;
+                        min-width: 0;
+                        height: 52px;
+                        padding: 7px 9px;
+                        font-size: 0.66rem;
+                    }
+
+                    .clock {
+                        grid-column: 1 / -1;
+                        justify-content: flex-start;
+                    }
+
+                    .content-grid {
+                        gap: 12px;
+                    }
+
+                    .map-shell {
+                        height: min(60vh, 360px);
+                        min-height: 250px;
+                    }
+
+                    .itinerary-form {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                        gap: 10px;
+                    }
+
+                    .itinerary-form .field:first-child,
+                    .itinerary-form .field:nth-child(2),
+                    .itinerary-form .field:nth-child(3),
+                    .itinerary-form .field:nth-child(4),
+                    .itinerary-form .field:nth-child(5),
+                    .itinerary-form .field:nth-child(6) {
+                        grid-column: span 1;
+                    }
+
+                    .itinerary-form .field:first-child,
+                    .itinerary-form .field:nth-child(3),
+                    .itinerary-form .field:nth-child(6),
+                    .itinerary-form .field.full {
+                        grid-column: 1 / -1;
+                    }
+
+                    .route-itinerary-grid {
+                        grid-template-columns: minmax(0, 1fr);
+                        gap: 12px;
+                        margin-top: 12px;
+                    }
+
+                    .airport-grid {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                        gap: 9px;
+                    }
+
+                    .itinerary-card-footer {
+                        align-items: stretch;
+                        flex-direction: column;
+                    }
+                }
+
+                @media (max-width: 420px) {
+                    .airport-grid {
+                        grid-template-columns: minmax(0, 1fr);
+                    }
+
+                    .route-summary {
+                        grid-template-columns: 1.1fr 0.75fr 0.9fr;
+                        padding-right: 4px;
+                        padding-left: 4px;
+                    }
+
+                    .route-pill {
+                        padding: 8px 6px;
+                    }
+
+                    .route-pill:first-child .route-pill-value {
+                        font-size: 1rem;
+                    }
+                }
             </style>
         </head>
         <body>
             <div class="viewport">
-                <div class="shell">
+                <aside class="app-sidebar" aria-label="Navegación principal">
+                    <div class="sidebar-brand">
+                        <div class="sidebar-brand-mark"><span>✈</span><strong>SIS</strong></div>
+                        <span>Sistema de<br />Itinerarios</span>
+                    </div>
+                    <nav class="sidebar-nav">
+                        <button type="button" class="sidebar-link is-active" data-scroll-target="top">
+                            <span class="sidebar-icon">⌂</span>Inicio
+                        </button>
+                        <button type="button" class="sidebar-link" data-scroll-target="itineraries-section">
+                            <span class="sidebar-icon">✈</span>Itinerarios
+                        </button>
+                        <button type="button" class="sidebar-link" data-scroll-target="airport-section">
+                            <span class="sidebar-icon">▣</span>Aeropuertos
+                        </button>
+                        <button type="button" class="sidebar-link" data-scroll-target="recommendation-section">
+                            <span class="sidebar-icon">✧</span>Recomendaciones
+                        </button>
+                        <span class="sidebar-link is-disabled" aria-disabled="true">
+                            <span class="sidebar-icon">♧</span>Notificaciones
+                        </span>
+                        <span class="sidebar-link is-disabled" aria-disabled="true">
+                            <span class="sidebar-icon">▥</span>Estadísticas
+                        </span>
+                    </nav>
+                    <div class="sidebar-caption">PLATAFORMA DE VIAJES</div>
+                </aside>
+
+                <main class="shell">
                     <header class="topbar">
                         <div class="title-wrap">
-                            <div class="eyebrow">Airport Service</div>
-                            <h1>Sistema de Itinerarios Personales</h1>
-                            <div class="subtitle">Servicio de aeropuertos · Colombia</div>
+                            <div class="eyebrow">Explora Colombia</div>
+                            <h1>Sistema de Itinerarios</h1>
+                            <div class="subtitle">Encuentra rutas, aeropuertos y crea tu próximo viaje</div>
                         </div>
-                        <div class="badge"><span class="plane">✈</span> Airport Service</div>
+                        <div class="topbar-status">
+                            <div class="badge">
+                                <span class="plane">◆</span>
+                                <span>Airport Service<small>Servicio de aeropuertos</small></span>
+                            </div>
+                            <div class="signal-box">
+                                <span class="signal-symbol">▰</span>
+                                <span class="signal-copy">API Colombia<small id="api-status">Verificando</small></span>
+                                <span class="signal-dot" id="api-dot" title="Estado"></span>
+                            </div>
+                            <div class="clock">
+                                <span class="clock-symbol">◷</span>
+                                <div class="clock-copy">
+                                    <time class="clock-time" id="clock-time">00:00</time>
+                                    <span class="clock-date" id="clock-date">2026</span>
+                                </div>
+                            </div>
+                        </div>
                     </header>
 
                     <div class="content-grid">
                         <section class="map-panel">
                             <div class="panel-header">
-                                <span>Mapa de Colombia</span>
-                                <span class="kpi" id="airport-count">0 registros</span>
+                                <span class="panel-title"><span class="heading-icon">⌖</span>Mapa de Colombia</span>
+                                <span class="kpi"><span class="heading-icon">✈</span><span id="airport-count">0 aeropuertos</span></span>
                             </div>
                             <div class="map-shell">
                                 <div id="map"></div>
                             </div>
                         </section>
 
-                        <aside class="side-panel">
-                            <div class="clock">
-                                <div class="clock-label">Colombia</div>
-                                <div class="clock-date" id="clock-date">2026</div>
-                                <div class="clock-time" id="clock-time">00:00</div>
+                        <section class="form-panel">
+                            <div class="form-header">
+                                <span class="panel-title"><span class="heading-icon">▣</span>Crear itinerario</span>
+                                <span id="route-status">Sin ruta</span>
                             </div>
-                            <div class="signal-box">
-                                <span>API Colombia</span>
-                                <span class="signal-dot" id="api-dot" title="Estado"></span>
-                            </div>
-                        </aside>
+                            <form class="itinerary-form" id="itinerary-form">
+                                <div class="field">
+                                    <label for="user-name">Tu nombre</label>
+                                    <input id="user-name" name="user_name" type="text" maxlength="120" value="Julian" required />
+                                </div>
+                                <div class="field">
+                                    <label for="origin">Origen</label>
+                                    <select id="origin" name="origin"></select>
+                                </div>
+                                <div class="field">
+                                    <label for="destination">Destino</label>
+                                    <select id="destination" name="destination"></select>
+                                </div>
+                                <div class="field date-field">
+                                    <label for="date">Fecha del viaje</label>
+                                    <input id="date" name="date" type="date" required />
+                                </div>
+                                <div class="field">
+                                    <label for="duration">Duración (minutos)</label>
+                                    <input id="duration" name="duration_minutes" type="number" min="1" max="10080" value="90" required />
+                                </div>
+                                <div class="field">
+                                    <label for="purpose">Motivo del viaje</label>
+                                    <input id="purpose" name="purpose" type="text" placeholder="Trabajo, turismo, reunión..." />
+                                </div>
+                                <div class="field full">
+                                    <button type="submit" id="submit-itinerary"><span class="button-plane">✈</span>Guardar itinerario</button>
+                                    <button type="button" id="cancel-edit" style="display:none;">Cancelar edición</button>
+                                </div>
+                            </form>
+                        </section>
                     </div>
 
-                    <section class="form-panel">
-                        <div class="form-header">
-                            <span>Crear itinerario</span>
-                            <span id="route-status">Sin ruta</span>
-                        </div>
-                        <form class="itinerary-form" id="itinerary-form">
-                            <div class="field">
-                                <label for="user-name">Tu nombre</label>
-                                <input id="user-name" name="user_name" type="text" maxlength="120" value="Julian" required />
-                            </div>
-                            <div class="field">
-                                <label for="origin">Origen</label>
-                                <select id="origin" name="origin"></select>
-                            </div>
-                            <div class="field">
-                                <label for="destination">Destino</label>
-                                <select id="destination" name="destination"></select>
-                            </div>
-                            <div class="field date-field">
-                                <label for="date">Fecha</label>
-                                <input id="date" name="date" type="date" required />
-                            </div>
-                            <div class="field">
-                                <label for="duration">Duración (minutos)</label>
-                                <input id="duration" name="duration_minutes" type="number" min="1" max="10080" value="90" required />
-                            </div>
-                            <div class="field">
-                                <label for="purpose">Motivo</label>
-                                <input id="purpose" name="purpose" type="text" placeholder="Trabajo, turismo, reunión..." />
-                            </div>
-                            <div class="field full">
-                                <button type="submit" id="submit-itinerary">Guardar itinerario</button>
-                                <button type="button" id="cancel-edit" style="display:none; margin-top:10px; background: linear-gradient(135deg, #dfeaf9, #f2f8ff); color: var(--text); border-color: rgba(90,168,255,0.18);">Cancelar edición</button>
-                            </div>
-                        </form>
-                    </section>
-
-                    <div class="route-summary" id="route-summary"></div>
-
-                    <section class="itineraries-section" id="itineraries-section" aria-labelledby="itineraries-title">
+                    <div class="route-itinerary-grid" id="itinerary-overview">
+                        <section class="route-panel">
+                            <div class="section-title"><span class="heading-icon">⌘</span>Resumen de ruta</div>
+                            <div class="route-summary" id="route-summary"></div>
+                        </section>
+                        <section class="itineraries-section" id="itineraries-section" aria-labelledby="itineraries-title">
                         <div class="itineraries-heading">
                             <div>
                                 <span class="itineraries-eyebrow">Tus planes de viaje</span>
-                                <h2 id="itineraries-title">Mis itinerarios</h2>
+                                <h2 id="itineraries-title"><span class="heading-icon">▣</span>Itinerarios registrados</h2>
                                 <p>Consulta tus rutas y administra cada viaje desde su tarjeta.</p>
                             </div>
                             <span class="itinerary-count" id="itinerary-count">0 viajes</span>
                         </div>
                         <div class="itinerary-list" id="itinerary-list"></div>
+                        </section>
+                    </div>
+
+                    <section class="airport-section" id="airport-section">
+                        <div class="airport-section-head">
+                            <h2><span class="heading-icon">♙</span>Aeropuertos destacados</h2>
+                            <span class="airport-badge">Datos de API Colombia</span>
+                        </div>
+                        <div class="airport-grid" id="airport-grid"></div>
                     </section>
 
-                    <div class="recommendations">
+                    <div class="recommendations" id="recommendation-section">
                         <div class="airport-section-head">
                             <h2>Recomendaciones</h2>
                             <span class="airport-badge">Más convenientes</span>
@@ -1511,7 +2472,7 @@ async def root() -> HTMLResponse:
                                     <span>mejor día</span>
                                     <strong>Entre semana</strong>
                                 </div>
-                            </div>
+                            </main>
                         </div>
                         <div class="recommendation-grid" id="recommendation-grid"></div>
                     </div>
@@ -1569,14 +2530,16 @@ async def root() -> HTMLResponse:
                     const timeEl = document.getElementById('clock-time');
                     const date = now.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
                     const time = now.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-                    dateEl.textContent = `COLOMBIA, ${date}`;
+                    dateEl.textContent = date;
                     timeEl.textContent = time;
                 }
 
                 function setApiState(ok) {
                     const dot = document.getElementById('api-dot');
+                    const status = document.getElementById('api-status');
                     dot.style.background = ok ? '#7ae0ab' : '#ff7b60';
                     dot.style.boxShadow = ok ? '0 0 14px rgba(122, 224, 171, 0.9)' : '0 0 14px rgba(255, 123, 96, 0.9)';
+                    status.textContent = ok ? 'Conectada' : 'Sin conexión';
                 }
 
                 function getAirportById(id) {
@@ -1707,9 +2670,9 @@ async def root() -> HTMLResponse:
 
                         const marker = L.circleMarker(coords, {
                             radius: selected ? 8 : 5,
-                            color: selected ? '#f7d37d' : '#7ae0ab',
+                            color: selected ? '#8b5cf6' : '#7ae0ab',
                             weight: 2,
-                            fillColor: selected ? '#f7d37d' : '#7ae0ab',
+                            fillColor: selected ? '#8b5cf6' : '#7ae0ab',
                             fillOpacity: 1
                         }).addTo(state.markersLayer);
 
@@ -1728,7 +2691,7 @@ async def root() -> HTMLResponse:
                             [origin.latitude, origin.longitude],
                             [destination.latitude, destination.longitude]
                         ], {
-                            color: '#f7d37d',
+                            color: '#8b5cf6',
                             weight: 2.5,
                             opacity: 0.9,
                             dashArray: '8 8'
@@ -1763,6 +2726,25 @@ async def root() -> HTMLResponse:
                             }
                         });
                     });
+                }
+
+                function renderAirportHighlights(airports) {
+                    const grid = document.getElementById('airport-grid');
+                    if (!grid) return;
+
+                    grid.innerHTML = airports.slice(0, 4).map((airport) => {
+                        const location = [airport.city, airport.department].filter(Boolean).join(' · ') || 'Colombia';
+                        return `
+                            <article class="airport-card">
+                                <div class="airport-visual" aria-hidden="true"><span>✈</span></div>
+                                <div class="airport-info">
+                                    <span class="airport-code">${escapeHtml(airportDisplayCode(airport))}</span>
+                                    <h3 class="airport-name">${escapeHtml(airport.name)}</h3>
+                                    <div class="airport-meta">${escapeHtml(location)}</div>
+                                </div>
+                            </article>
+                        `;
+                    }).join('');
                 }
 
                 function renderRecommendations() {
@@ -2073,7 +3055,8 @@ async def root() -> HTMLResponse:
                         const airports = await res.json();
                         state.airports = airports;
                         setApiState(true);
-                        document.getElementById('airport-count').textContent = `${airports.length} registros`;
+                        document.getElementById('airport-count').textContent = `${airports.length} aeropuertos`;
+                        renderAirportHighlights(airports);
                         renderRecommendations();
                         populateSelectors(airports);
                     } catch (error) {
