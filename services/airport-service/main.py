@@ -1026,13 +1026,33 @@ async def root() -> HTMLResponse:
                     display: grid;
                     grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr));
                     gap: 16px;
+                    const customPurposeField = document.getElementById('custom-purpose-field');
+                    const customPurposeInput = document.getElementById('custom-purpose');
+                    const [firstName, ...lastNameParts] = String(itinerary.user_name || '').trim().split(/\\s+/);
                 }
 
                 .itinerary-item {
                     position: relative;
-                    display: flex;
+                    state.editingTravelDate = itinerary.travel_date || null;
+                    const today = getLocalDateValue();
+                    dateInput.min = state.editingTravelDate && state.editingTravelDate < today
+                        ? state.editingTravelDate
+                        : today;
+                    document.getElementById('first-name').value = firstName || '';
+                    document.getElementById('last-name').value = lastNameParts.join(' ');
                     flex-direction: column;
-                    gap: 18px;
+                    const purposes = [...purposeInput.options].map(option => option.value);
+                    if (purposes.includes(itinerary.purpose)) {
+                        purposeInput.value = itinerary.purpose || '';
+                        customPurposeField.hidden = true;
+                        customPurposeInput.required = false;
+                        customPurposeInput.value = '';
+                    } else {
+                        purposeInput.value = 'Otro';
+                        customPurposeField.hidden = false;
+                        customPurposeInput.required = true;
+                        customPurposeInput.value = itinerary.purpose || '';
+                    }
                     min-width: 0;
                     padding: 20px;
                     border: 1px solid rgba(89, 153, 224, 0.22);
@@ -1040,26 +1060,77 @@ async def root() -> HTMLResponse:
                     background: linear-gradient(145deg, rgba(255,255,255,0.98), rgba(232,243,255,0.96));
                     color: var(--text);
                     box-shadow: 0 14px 30px rgba(50, 94, 145, 0.1), inset 0 1px 0 rgba(255,255,255,0.9);
+                    state.editingTravelDate = null;
+                    document.getElementById('date').min = getLocalDateValue();
                     transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
                 }
 
+
+                document.getElementById('purpose').addEventListener('change', function () {
+                    const customPurposeField = document.getElementById('custom-purpose-field');
+                    const customPurposeInput = document.getElementById('custom-purpose');
+                    const isOther = this.value === 'Otro';
+                    customPurposeField.hidden = !isOther;
+                    customPurposeInput.required = isOther;
+                    if (!isOther) customPurposeInput.value = '';
+                });
                 .itinerary-item:not(.itinerary-empty):hover {
                     transform: translateY(-4px);
                     border-color: rgba(45, 143, 233, 0.44);
                     box-shadow: 0 20px 38px rgba(45, 108, 174, 0.17), inset 0 1px 0 rgba(255,255,255,0.95);
-                }
-
+                        const form = document.getElementById('itinerary-form');
+                        const message = document.getElementById('form-message');
+                        const firstName = document.getElementById('first-name').value.trim();
+                        const lastName = document.getElementById('last-name').value.trim();
+                        const originValue = document.getElementById('origin').value;
+                        const destinationValue = document.getElementById('destination').value;
+                        const originId = originValue ? Number(originValue) : null;
+                        const destinationId = destinationValue ? Number(destinationValue) : null;
                 .itinerary-card-head,
                 .itinerary-card-footer,
+                        const travelDate = document.getElementById('date').value;
+                        const durationValue = Number(document.getElementById('duration').value);
+                        const purposeValue = document.getElementById('purpose').value;
+                        const customPurpose = document.getElementById('custom-purpose').value.trim();
+                        const submitButton = document.getElementById('submit-itinerary');
+                        message.textContent = '';
+
+                        if (!form.reportValidity()) return;
+                        if (travelDate < getLocalDateValue() && travelDate !== state.editingTravelDate) {
+                            message.textContent = 'La fecha del viaje no puede ser anterior a hoy.';
+                            return;
+                        }
+                        if (!firstName || !lastName) {
+                            message.textContent = 'Escribe tu nombre y tus apellidos.';
+                            return;
+                        }
+                        if (originId === destinationId) {
+                            message.textContent = 'El origen y el destino deben ser diferentes.';
+                            return;
+                        }
+                        if (!origin || !destination) {
+                            message.textContent = 'Selecciona un aeropuerto de origen y uno de destino válidos.';
+                            return;
+                        }
+                        if (!Number.isInteger(durationValue) || durationValue < 1 || durationValue > 10080) {
+                            message.textContent = 'Ingresa una duración válida en minutos (entre 1 y 10080).';
+                            return;
+                        }
+
                 .itinerary-actions,
                 .itinerary-details {
-                    display: flex;
+                            user_name: `${firstName} ${lastName}`.trim(),
                     justify-content: space-between;
                     align-items: center;
-                    gap: 10px;
-                }
-
+                            travel_date: travelDate,
+                            duration_minutes: durationValue,
+                            purpose: purposeValue === 'Otro' ? customPurpose : purposeValue
                 .itinerary-card-head {
+                        if (payload.user_name.length > 120 || !payload.purpose.trim()) {
+                            message.textContent = 'Revisa el nombre completo y el motivo del viaje.';
+                            submitButton.disabled = false;
+                            return;
+                        }
                     color: #426888;
                     font-size: 0.72rem;
                     font-weight: 700;
@@ -1233,27 +1304,14 @@ async def root() -> HTMLResponse:
                     position: fixed;
                     left: 0;
                     right: 0;
-                    bottom: 0;
-                    height: 52px;
-                    background: linear-gradient(180deg, rgba(64, 124, 206, 0.95), rgba(33, 92, 175, 0.96));
+                            form.reset();
+                            document.getElementById('custom-purpose-field').hidden = true;
+                            document.getElementById('custom-purpose').required = false;
+                            message.textContent = '';
                     border-top: 1px solid rgba(213, 234, 255, 0.5);
                     backdrop-filter: blur(14px);
                     display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    padding: 0 18px;
-                    z-index: 10;
-                    box-shadow: 0 -10px 20px rgba(44, 90, 160, 0.18);
-                }
-
-                .taskbar-left, .taskbar-right {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                }
-
-                .win-icon, .app-pill, .task-dot {
-                    display: inline-flex;
+                            message.textContent = `No se pudo guardar el itinerario: ${error.message}`;
                     align-items: center;
                     justify-content: center;
                     border-radius: 10px;
@@ -1507,17 +1565,6 @@ async def root() -> HTMLResponse:
                     width: 20px;
                     color: inherit;
                     font-size: 1rem;
-                }
-
-                .sidebar-link.is-disabled {
-                    opacity: 0.78;
-                    cursor: default;
-                }
-
-                .sidebar-link.is-disabled:hover {
-                    background: transparent;
-                    box-shadow: none;
-                    transform: none;
                 }
 
                 .sidebar-caption {
@@ -1779,7 +1826,7 @@ async def root() -> HTMLResponse:
                 }
 
                 .map-shell {
-                    height: 274px;
+                    height: clamp(420px, calc(100vh - 180px), 780px);
                     margin: 0;
                     border: 0;
                     border-radius: 0 0 15px 15px;
@@ -2199,7 +2246,7 @@ async def root() -> HTMLResponse:
                     }
 
                     .map-shell {
-                        height: 300px;
+                        height: clamp(400px, calc(100vh - 220px), 740px);
                     }
 
                     .itinerary-form {
@@ -2251,8 +2298,8 @@ async def root() -> HTMLResponse:
                     }
 
                     .map-shell {
-                        height: min(60vh, 360px);
-                        min-height: 250px;
+                        height: clamp(360px, calc(100vh - 220px), 680px);
+                        min-height: 360px;
                     }
 
                     .itinerary-form {
@@ -2312,6 +2359,110 @@ async def root() -> HTMLResponse:
                         font-size: 1rem;
                     }
                 }
+
+                .itinerary-form {
+                    display: grid;
+                    grid-template-columns: minmax(0, 1fr);
+                    gap: 0;
+                    padding: 0;
+                }
+
+                .form-section {
+                    grid-column: 1 / -1;
+                    padding: 18px 22px;
+                    border-bottom: 1px solid #eeeff7;
+                }
+
+                .form-section-heading {
+                    margin-bottom: 12px;
+                    color: #14203f;
+                    font-size: 0.85rem;
+                    font-weight: 800;
+                }
+
+                .form-section-fields {
+                    display: grid;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    gap: 12px;
+                }
+
+                .form-section .field[hidden] {
+                    display: none;
+                }
+
+                .required-mark {
+                    color: #b42318;
+                }
+
+                .form-actions {
+                    grid-column: 1 / -1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    padding: 14px 22px 18px;
+                }
+
+                .form-message {
+                    margin: 0;
+                    color: #b42318;
+                    font-size: 0.78rem;
+                }
+
+                .form-message:empty {
+                    display: none;
+                }
+
+                .form-action-buttons {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: flex-end;
+                    gap: 8px;
+                    margin-left: auto;
+                }
+
+                .form-action-buttons #submit-itinerary {
+                    width: auto;
+                    min-width: 190px;
+                }
+
+                #cancel-edit {
+                    min-height: 38px;
+                    padding: 8px 14px;
+                    border: 1px solid #d8d8f5;
+                    border-radius: 999px;
+                    background: #f7f7ff;
+                    color: #34415f;
+                    font-size: 0.74rem;
+                    font-weight: 700;
+                }
+
+                @media (max-width: 760px) {
+                    .form-section {
+                        padding: 16px;
+                    }
+
+                    .form-section-fields {
+                        grid-template-columns: minmax(0, 1fr);
+                    }
+
+                    .form-actions {
+                        align-items: stretch;
+                        flex-direction: column;
+                        padding: 14px 16px 18px;
+                    }
+
+                    .form-action-buttons {
+                        width: 100%;
+                        margin-left: 0;
+                    }
+
+                    .form-action-buttons #submit-itinerary,
+                    #cancel-edit {
+                        flex: 1 1 100%;
+                        width: 100%;
+                    }
+                }
             </style>
         </head>
         <body>
@@ -2334,12 +2485,6 @@ async def root() -> HTMLResponse:
                         <button type="button" class="sidebar-link" data-scroll-target="recommendation-section">
                             <span class="sidebar-icon">✧</span>Recomendaciones
                         </button>
-                        <span class="sidebar-link is-disabled" aria-disabled="true">
-                            <span class="sidebar-icon">♧</span>Notificaciones
-                        </span>
-                        <span class="sidebar-link is-disabled" aria-disabled="true">
-                            <span class="sidebar-icon">▥</span>Estadísticas
-                        </span>
                     </nav>
                     <div class="sidebar-caption">PLATAFORMA DE VIAJES</div>
                 </aside>
@@ -2388,33 +2533,63 @@ async def root() -> HTMLResponse:
                                 <span id="route-status">Sin ruta</span>
                             </div>
                             <form class="itinerary-form" id="itinerary-form">
-                                <div class="field">
-                                    <label for="user-name">Tu nombre</label>
-                                    <input id="user-name" name="user_name" type="text" maxlength="120" value="Julian" required />
-                                </div>
-                                <div class="field">
-                                    <label for="origin">Origen</label>
-                                    <select id="origin" name="origin"></select>
-                                </div>
-                                <div class="field">
-                                    <label for="destination">Destino</label>
-                                    <select id="destination" name="destination"></select>
-                                </div>
-                                <div class="field date-field">
-                                    <label for="date">Fecha del viaje</label>
-                                    <input id="date" name="date" type="date" required />
-                                </div>
-                                <div class="field">
-                                    <label for="duration">Duración (minutos)</label>
-                                    <input id="duration" name="duration_minutes" type="number" min="1" max="10080" value="90" required />
-                                </div>
-                                <div class="field">
-                                    <label for="purpose">Motivo del viaje</label>
-                                    <input id="purpose" name="purpose" type="text" placeholder="Trabajo, turismo, reunión..." />
-                                </div>
-                                <div class="field full">
-                                    <button type="submit" id="submit-itinerary"><span class="button-plane">✈</span>Guardar itinerario</button>
-                                    <button type="button" id="cancel-edit" style="display:none;">Cancelar edición</button>
+                                <section class="form-section" aria-labelledby="traveler-heading">
+                                    <div class="form-section-heading" id="traveler-heading">Información del viajero</div>
+                                    <div class="form-section-fields">
+                                        <div class="field">
+                                            <label for="first-name">Nombre <span class="required-mark">*</span></label>
+                                            <input id="first-name" name="first_name" type="text" maxlength="60" autocomplete="given-name" required />
+                                        </div>
+                                        <div class="field">
+                                            <label for="last-name">Apellidos <span class="required-mark">*</span></label>
+                                            <input id="last-name" name="last_name" type="text" maxlength="60" autocomplete="family-name" required />
+                                        </div>
+                                    </div>
+                                </section>
+                                <section class="form-section" aria-labelledby="trip-heading">
+                                    <div class="form-section-heading" id="trip-heading">Detalles del viaje</div>
+                                    <div class="form-section-fields">
+                                        <div class="field">
+                                            <label for="origin">Aeropuerto de origen <span class="required-mark">*</span></label>
+                                            <select id="origin" name="origin" required></select>
+                                        </div>
+                                        <div class="field">
+                                            <label for="destination">Aeropuerto de destino <span class="required-mark">*</span></label>
+                                            <select id="destination" name="destination" required></select>
+                                        </div>
+                                        <div class="field">
+                                            <label for="date">Fecha del viaje <span class="required-mark">*</span></label>
+                                            <input id="date" name="date" type="date" required />
+                                        </div>
+                                        <div class="field">
+                                            <label for="duration">Duración del viaje (minutos) <span class="required-mark">*</span></label>
+                                            <input id="duration" name="duration_minutes" type="number" min="1" max="10080" value="90" required />
+                                        </div>
+                                        <div class="field">
+                                            <label for="purpose">Motivo del viaje <span class="required-mark">*</span></label>
+                                            <select id="purpose" name="purpose" required>
+                                                <option value="">Selecciona un motivo</option>
+                                                <option value="Turismo">Turismo</option>
+                                                <option value="Vacaciones">Vacaciones</option>
+                                                <option value="Trabajo">Trabajo</option>
+                                                <option value="Reunión de negocios">Reunión de negocios</option>
+                                                <option value="Estudios">Estudios</option>
+                                                <option value="Visita familiar">Visita familiar</option>
+                                                <option value="Otro">Otro</option>
+                                            </select>
+                                        </div>
+                                        <div class="field" id="custom-purpose-field" hidden>
+                                            <label for="custom-purpose">Especifica el motivo <span class="required-mark">*</span></label>
+                                            <input id="custom-purpose" name="custom_purpose" type="text" maxlength="120" />
+                                        </div>
+                                    </div>
+                                </section>
+                                <div class="form-actions">
+                                    <p class="form-message" id="form-message" role="alert" aria-live="polite"></p>
+                                    <div class="form-action-buttons">
+                                        <button type="submit" id="submit-itinerary"><span class="button-plane">✈</span>Guardar itinerario</button>
+                                        <button type="button" id="cancel-edit" style="display:none;">Cancelar edición</button>
+                                    </div>
                                 </div>
                             </form>
                         </section>
@@ -2521,8 +2696,18 @@ async def root() -> HTMLResponse:
                     map: null,
                     markersLayer: null,
                     routeLayer: null,
-                    editingId: null
+                    editingId: null,
+                    editingTravelDate: null
                 };
+
+                const COLOMBIA_MAP_BOUNDS = [[-5, -82], [14, -66]];
+
+                function getLocalDateValue(date = new Date()) {
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
 
                 function updateClock() {
                     const now = new Date();
@@ -2543,7 +2728,22 @@ async def root() -> HTMLResponse:
                 }
 
                 function getAirportById(id) {
+                    if (id == null || id === '') return undefined;
                     return state.airports.find(a => Number(a.id) === Number(id));
+                }
+
+                function getAirportCoordinates(airport) {
+                    if (!airport) return null;
+
+                    const latitude = Number(airport.latitude);
+                    const longitude = Number(airport.longitude);
+                    const isColombianPosition = (lat, lon) =>
+                        Number.isFinite(lat) && Number.isFinite(lon) &&
+                        lat >= -5 && lat <= 14 && lon >= -82 && lon <= -66;
+
+                    if (isColombianPosition(latitude, longitude)) return { latitude, longitude };
+                    if (isColombianPosition(longitude, latitude)) return { latitude: longitude, longitude: latitude };
+                    return null;
                 }
 
                 function escapeHtml(value) {
@@ -2591,7 +2791,9 @@ async def root() -> HTMLResponse:
 
                 function renderRouteSummary(origin, destination) {
                     const summary = document.getElementById('route-summary');
-                    if (!origin || !destination || origin.latitude == null || origin.longitude == null || destination.latitude == null || destination.longitude == null) {
+                    const originCoordinates = getAirportCoordinates(origin);
+                    const destinationCoordinates = getAirportCoordinates(destination);
+                    if (!originCoordinates || !destinationCoordinates) {
                         summary.innerHTML = `
                             <div class="route-pill">
                                 <span class="route-pill-label">Ruta</span>
@@ -2609,7 +2811,12 @@ async def root() -> HTMLResponse:
                         return;
                     }
 
-                    const km = haversineKm(origin.latitude, origin.longitude, destination.latitude, destination.longitude);
+                    const km = haversineKm(
+                        originCoordinates.latitude,
+                        originCoordinates.longitude,
+                        destinationCoordinates.latitude,
+                        destinationCoordinates.longitude
+                    );
                     const originCode = airportDisplayCode(origin);
                     const destinationCode = airportDisplayCode(destination);
                     summary.innerHTML = `
@@ -2660,12 +2867,14 @@ async def root() -> HTMLResponse:
                     state.markersLayer.clearLayers();
                     state.routeLayer.clearLayers();
 
-                    const points = state.airports.filter(airport => airport.latitude != null && airport.longitude != null);
+                    const points = state.airports
+                        .map(airport => ({ airport, coordinates: getAirportCoordinates(airport) }))
+                        .filter(point => point.coordinates);
                     const bounds = [];
 
-                    points.forEach((airport) => {
+                    points.forEach(({ airport, coordinates }) => {
                         const selected = Number(airport.id) === originId || Number(airport.id) === destinationId;
-                        const coords = [airport.latitude, airport.longitude];
+                        const coords = [coordinates.latitude, coordinates.longitude];
                         bounds.push(coords);
 
                         const marker = L.circleMarker(coords, {
@@ -2686,10 +2895,12 @@ async def root() -> HTMLResponse:
                         marker.bindPopup(`<strong>${airport.name}</strong><br>${airport.city || 'Ciudad'}<br>${airport.department || 'Departamento'}<br>${codeText}`);
                     });
 
-                    if (origin && destination && origin.latitude != null && origin.longitude != null && destination.latitude != null && destination.longitude != null) {
+                    const originCoordinates = getAirportCoordinates(origin);
+                    const destinationCoordinates = getAirportCoordinates(destination);
+                    if (origin && destination && origin.id !== destination.id && originCoordinates && destinationCoordinates) {
                         const route = L.polyline([
-                            [origin.latitude, origin.longitude],
-                            [destination.latitude, destination.longitude]
+                            [originCoordinates.latitude, originCoordinates.longitude],
+                            [destinationCoordinates.latitude, destinationCoordinates.longitude]
                         ], {
                             color: '#8b5cf6',
                             weight: 2.5,
@@ -2701,7 +2912,7 @@ async def root() -> HTMLResponse:
                             state.map.fitBounds(route.getBounds(), { padding: [28, 28] });
                         }
                     } else if (bounds.length) {
-                        state.map.fitBounds(bounds, { padding: [28, 28] });
+                        state.map.fitBounds(COLOMBIA_MAP_BOUNDS, { padding: [28, 28] });
                     } else {
                         state.map.setView([4.5709, -74.2973], 6);
                     }
@@ -2843,26 +3054,30 @@ async def root() -> HTMLResponse:
                 function populateSelectors(airports) {
                     const origin = document.getElementById('origin');
                     const destination = document.getElementById('destination');
-                    origin.innerHTML = airports.map(a => `<option value="${a.id}">${a.name} (${airportDisplayCode(a)})</option>`).join('');
-                    destination.innerHTML = airports.map(a => `<option value="${a.id}">${a.name} (${airportDisplayCode(a)})</option>`).join('');
-
-                    if (airports.length > 1) {
-                        origin.value = String(airports[0].id);
-                        destination.value = String(airports[1].id);
-                    }
+                    const options = airports.map(airport => `<option value="${airport.id}">${escapeHtml(airport.name)} (${airportDisplayCode(airport)})</option>`).join('');
+                    origin.innerHTML = `<option value="">Selecciona un aeropuerto</option>${options}`;
+                    destination.innerHTML = `<option value="">Selecciona un aeropuerto</option>${options}`;
 
                     updateRoute();
                 }
 
                 function updateRoute() {
-                    const originId = Number(document.getElementById('origin').value);
-                    const destinationId = Number(document.getElementById('destination').value);
+                    const originValue = document.getElementById('origin').value;
+                    const destinationValue = document.getElementById('destination').value;
+                    const originId = originValue ? Number(originValue) : null;
+                    const destinationId = destinationValue ? Number(destinationValue) : null;
                     const origin = getAirportById(originId);
                     const destination = getAirportById(destinationId);
                     const routeStatusEl = document.getElementById('route-status');
+                    const originCoordinates = getAirportCoordinates(origin);
+                    const destinationCoordinates = getAirportCoordinates(destination);
 
-                    if (!origin || !destination || origin.latitude == null || origin.longitude == null || destination.latitude == null || destination.longitude == null) {
-                        routeStatusEl.textContent = 'Sin ruta';
+                    if (!origin || !destination || origin.id === destination.id || !originCoordinates || !destinationCoordinates) {
+                        routeStatusEl.textContent = origin && destination && origin.id === destination.id
+                            ? 'Selecciona aeropuertos diferentes'
+                            : origin && destination && (!originCoordinates || !destinationCoordinates)
+                                ? 'Coordenadas no disponibles'
+                                : 'Sin ruta';
                         renderMap();
                         return;
                     }
@@ -3016,8 +3231,10 @@ async def root() -> HTMLResponse:
                 document.getElementById('cancel-edit').addEventListener('click', function () {
                     resetFormMode();
                     document.getElementById('itinerary-form').reset();
-                    document.getElementById('user-name').value = 'Julian';
-                    document.getElementById('duration').value = '90';
+                    document.getElementById('custom-purpose-field').hidden = true;
+                    document.getElementById('custom-purpose').required = false;
+                    document.getElementById('form-message').textContent = '';
+                    updateRoute();
                 });
 
                 document.getElementById('itinerary-list').addEventListener('click', function (event) {
@@ -3073,6 +3290,7 @@ async def root() -> HTMLResponse:
                 }
 
                 updateClock();
+                document.getElementById('date').min = getLocalDateValue();
                 setInterval(updateClock, 1000);
                 bindTaskbarActions();
                 initMap();
