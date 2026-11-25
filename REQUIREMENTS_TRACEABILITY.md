@@ -60,7 +60,7 @@ La instancia local se encontraba en `http://localhost:9000` y se ejecutó el sca
 - PR #1 (`docs/docker-only-startup`), #3 (`fix/edicion-itinerario`) y #4 (`feature/tarjetas-itinerarios`) están integrados.
 - PR #2 (`fix/handle-deleted-itinerary-while-editing`) se cerró sin integrarse; el cambio equivalente quedó en PR #3.
 - `feature/modernizacion-frontend` está publicada en GitHub con un commit que todavía no tiene PR.
-- Los archivos locales de Locust y esta documentación no se consideran en GitHub hasta quedar añadidos a un commit de rama y enviados.
+- Los archivos de Locust y esta documentación ya están en la rama del PR #5 y visibles para revisión; todavía no forman parte de `main`.
 
 ## Pendientes antes de afirmar cumplimiento total
 

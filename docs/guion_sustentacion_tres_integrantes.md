@@ -118,7 +118,7 @@ Itinerary y Notification usan PostgreSQL. Compose también define PostgreSQL de 
 - `feature/` identifica funcionalidad nueva, `fix/` una corrección y `docs/` documentación.
 - Se trabaja en una rama y se abre un PR hacia `main`; el PR permite ver diff, conversación y aprobación antes de integrar.
 - PR #1, #3 y #4 se integraron; PR #2 se cerró sin merge porque duplicaba la corrección que se integró en #3.
-- La rama `feature/modernizacion-frontend` está publicada; los cambios locales de Locust y este guion aún deben quedar en un commit y PR para que también se vean en GitHub.
+- La rama `feature/modernizacion-frontend` está publicada con el PR #5 abierto; el frontend, Locust y este guion ya se ven en el diff. El PR aún no se ha integrado en `main`.
 - Las iteraciones se cuentan en los sprints de Jira. Las 12 fases de una versión anterior del README eran etapas del plan, no una prueba de que existan 12 sprints. Confirmen la cifra en Jira.
 
 ## Dockerfile, Compose y despliegue
@@ -205,7 +205,7 @@ Resiliencia actual es parcial, no alta disponibilidad:
 - [ ] SonarQube abre en `http://localhost:9000`; no proyectar el token.
 - [ ] Para mostrar Locust, iniciar el proceso y abrir `http://localhost:8089`.
 - [ ] Aclarar que Locust creó registros y que la muestra fue local.
-- [ ] Abrir GitHub con los PRs integrados y la rama/PR actual que el equipo dejó listos.
+- [ ] Abrir GitHub: mostrar PR #1, #3 y #4 integrados y PR #5 abierto para revisión; no afirmar que PR #5 ya se integró.
 - [ ] Confirmar sprints en Jira y recibir del integrante el documento de arquitectura.
 - [ ] No usar `docker compose down -v` durante la demo.
 

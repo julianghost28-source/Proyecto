@@ -140,7 +140,7 @@ Las bases PostgreSQL de Itinerary y Notification se usan. La base `postgres-airp
 
 El repositorio es [julianghost28-source/Proyecto](https://github.com/julianghost28-source/Proyecto). Se usan nombres descriptivos con prefijos `feature/`, `fix/` y `docs/`. Una rama contiene una tarea; un pull request (PR) permite revisar el diff antes de integrar a `main`.
 
-Historial verificado: PR #1 (Docker-only startup), #3 (edición de itinerario eliminado) y #4 (tarjetas del frontend) se integraron; PR #2 se cerró sin integrar por duplicar la corrección del #3. La rama actual de modernización de frontend está publicada, pero aún necesita su PR. Los archivos nuevos de Locust y la documentación de exposición se deben añadir al PR antes de decir que están en GitHub.
+Historial verificado: PR #1 (Docker-only startup), #3 (edición de itinerario eliminado) y #4 (tarjetas del frontend) se integraron; PR #2 se cerró sin integrar por duplicar la corrección del #3. La rama de modernización de frontend tiene el PR #5 abierto hacia `main`. El PR #5 incluye Locust, el README actualizado y el guion de exposición. Está publicado para revisión, pero aún no se ha integrado a `main`.
 
 ## Documentos
 
