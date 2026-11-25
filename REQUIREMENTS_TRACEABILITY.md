@@ -1,72 +1,73 @@
-# Trazabilidad de requerimientos
+# Trazabilidad de la rúbrica y estado del proyecto
 
-Leyenda de estado: `PENDIENTE` · `PARCIAL` · `CUBIERTO`.
+Esta matriz refleja el código y las ejecuciones observadas en la rama local `feature/modernizacion-frontend` a 24 de noviembre de 2026. Se separa lo implementado de lo ejecutado y de lo que está pendiente de integración en GitHub. No convierte fases del README en iteraciones de Jira.
 
-## Requerimientos funcionales
-
-| ID | Descripción | Servicio | Endpoint / artefacto | Código | Test | Estado |
-| --- | --- | --- | --- | --- | --- | --- |
-| RF-01 | Consultar aeropuertos | Airport Service | Fase 2 | — | — | PENDIENTE |
-| RF-02 | Consultar aeropuerto por ID | Airport Service | Fase 2 | — | — | PENDIENTE |
-| RF-03 | Mapa interactivo Plotly JS | Frontend | Fase 7 | — | — | PENDIENTE |
-| RF-04 | Crear itinerario | Itinerary Service | Fase 3 | — | — | PENDIENTE |
-| RF-05 | Validar aeropuertos vía Airport Service | Itinerary Service | Fase 3 | — | — | PENDIENTE |
-| RF-06 | Consultar itinerarios | Itinerary Service | Fase 3 | — | — | PENDIENTE |
-| RF-07 | Consultar itinerario por ID | Itinerary Service | Fase 3 | — | — | PENDIENTE |
-| RF-08 | Actualizar itinerario | Itinerary Service | Fase 3 | — | — | PENDIENTE |
-| RF-09 | Eliminar itinerario | Itinerary Service | Fase 3 | — | — | PENDIENTE |
-| RF-10 | Generar `ItineraryCreatedEvent` | Itinerary Service | Fase 4 | — | — | PENDIENTE |
-| RF-11 | Procesar evento de forma asíncrona | Notification Worker | Fase 5 | — | — | PENDIENTE |
-| RF-12 | Registrar notificación | Notification Worker | Fase 5 | — | — | PENDIENTE |
-| RF-13 | Reportes bajo demanda | Report Function | Fase 8 | — | — | PENDIENTE |
-
-## Requerimientos no funcionales
-
-| ID | Descripción | Evidencia Fase 1 | Estado |
-| --- | --- | --- | --- |
-| RNF-01 | Microservicios | Bounded contexts aislados; servicios de aplicación en fases 2–8 | PARCIAL |
-| RNF-02 | Hexagonal | Se aplicará por servicio desde Fase 2 | PENDIENTE |
-| RNF-03 | Adapter API externa | Airport Service Fase 2 | PENDIENTE |
-| RNF-04 | DDD | Un contexto por servicio; DBs separadas ya provisionadas | PARCIAL |
-| RNF-05 | Independencia de datos | `postgres-airport`, `postgres-itinerary`, `postgres-notification` (contenedores y volúmenes distintos) | CUBIERTO (infra) |
-| RNF-06 | Alembic | Fase 2+ | PENDIENTE |
-| RNF-07 | OpenAPI | Fase 2+ | PENDIENTE |
-| RNF-08 | Errores uniformes | Fase 2+ | PENDIENTE |
-| RNF-09 | Resiliencia HTTP | Fase 2 | PENDIENTE |
-| RNF-10 | Redis | Servicio `redis` healthy, password por env, volumen persistente | CUBIERTO (infra) |
-| RNF-11 | Mensajería | RabbitMQ + exchange/colas/DLQ en `infra/rabbitmq/definitions.json` | CUBIERTO (infra) |
-| RNF-12 | Observabilidad | Collector OTLP, Jaeger, Prometheus, Grafana, dashboard de infra | PARCIAL (stack; falta instrumentación de apps) |
-| RNF-13 | Correlation ID | Fase 6 | PENDIENTE |
-| RNF-14 | Seguridad | `.env` gitignored, secretos por env, DBs no publicadas, Grafana sin signup | PARCIAL |
-| RNF-15 | Contenerización | Imágenes oficiales versionadas en Compose | CUBIERTO (infra) |
-| RNF-16 | Docker Compose | `docker-compose.yml` orquesta el entorno | CUBIERTO |
-| RNF-17 | Pruebas | `scripts/check-infra.ps1` / `.sh` como smoke de infra; pytest desde Fase 2 | PARCIAL |
-| RNF-18 | CI/CD | Fase 12 | PENDIENTE |
-
-## Verificación de runtime (Fase 1)
-
-| Comando | Resultado |
-| --- | --- |
-| `docker compose config` | **BLOQUEADO** — `docker` no está instalado en el PATH de esta máquina |
-| `docker compose build` | **BLOQUEADO** (mismo motivo) |
-| `docker compose up -d` | **BLOQUEADO** |
-| `docker compose ps` | **BLOQUEADO** |
-| `scripts/check-infra.ps1` | Pendiente de Docker healthy |
-
-Reanudar verificación en cuanto Docker Desktop esté instalado y el daemon activo. No iniciar Fase 2 hasta entonces.
-
-## Decisiones de Fase 1
-
-| Decisión | Motivo | Impacto RF/RNF |
+| Punto | Estado actual | Evidencia / comentario |
 | --- | --- | --- |
-| Tres contenedores PostgreSQL en lugar de un solo motor con tres bases | Aislamiento operativo alineado con RNF-05 y claridad de bounded context | No viola RF; simplifica que un servicio no pueda “ver” el disco del otro |
-| No publicar PostgreSQL/Redis/AMQP en el host | RNF-14: reducir superficie | Los clientes de aplicación usarán DNS interno de Compose |
-| Precargar topología RabbitMQ | El worker no debe declarar la verdad de routing en caliente de forma implícita | RF-10/11 listos a nivel de broker |
-| No crear carpetas vacías de servicios | Evitar falsos positivos de “estructura completa” | Las fases 2+ añaden código ejecutable |
+| Documento corto de arquitectura | Pendiente de incorporar/verificar | El equipo indicó que un integrante lo prepara. No se encontró el documento dentro del repositorio local inspeccionado. |
+| Microservicios con HTTP y eventos | Implementado | Airport, Itinerary y Notification; HTTP para lectura/validación/CRUD, RabbitMQ para `ItineraryCreatedEvent`. |
+| Arquitectura hexagonal por servicio | Parcial | Itinerary tiene dominio, puertos, casos de uso e infraestructura; la separación no está igual de completa en Airport y Notification. |
+| Patrón Adapter | Implementación visible, estructura parcial | `HttpAirportCatalog` adapta la consulta HTTP detrás del puerto. `normalize_airport` transforma el JSON de API Colombia, pero vive en `services/airport-service/main.py` y no en una clase adaptadora separada. |
+| Jira / backlog / iteraciones | Verificar con el tablero | No se puede confirmar desde el repositorio cuántos sprints/iteraciones hay. Las 12 fases del README anterior no son un conteo de iteraciones. |
+| Ramas y commits | Implementado | Hay ramas `feature/`, `fix/` y `docs/`; conservar `main` para integrar trabajo revisado. |
+| Pull requests | Implementado como flujo | PR #1, #3 y #4 integrados; PR #2 cerrado sin merge por duplicidad. La rama `feature/modernizacion-frontend` todavía no tiene PR. |
+| Pruebas unitarias | Parcial | Esta rama contiene el test fuente `services/airport-service/test_airport_coords.py` para normalización de coordenadas. No contiene la suite de 18 casos mencionada en un documento anterior. |
+| Pruebas de carga | Ejemplo local implementado y ejecutado | `performance/locustfile.py`; ejecución observada con 10 usuarios, 96 requests y 0 fallos. Los POST crean datos persistentes; cifras son de una prueba local puntual. |
+| Swagger / OpenAPI | Implementado parcialmente | Swagger de Itinerary en `http://localhost:8002/docs`, Notification en `http://localhost:8003/docs`. Algunas rutas de Airport se excluyen del esquema OpenAPI. |
+| SonarQube | Análisis manual local | Último dashboard revisado: Quality Gate Passed, hallazgos abiertos, cobertura 0 % y avisos. Configuración adicional de `sonar.python.version`/`sonar.tests` no quedó aplicada: Pysonar rechazó los argumentos `-D` usados. |
+| CI / build / pruebas automáticas | Pendiente | No se encontró `.github/workflows`; el análisis y las pruebas se ejecutan manualmente. |
+| Despliegue continuo | Pendiente | El despliegue observado es local mediante Compose; no hay despliegue automático ni publicación a Azure. |
+| Dockerfiles de servicios | Implementado | Cada uno de los tres servicios de aplicación tiene su Dockerfile. |
+| Docker Compose por servicio | Parcial frente a requisito literal | Actualmente hay un Compose central que arranca servicios y dependencias; no hay un archivo Compose separado por servicio. |
+| Diseño básico / separación de responsabilidades | Parcial/implementado | Microservicios con responsabilidades distintas, contratos HTTP, dominio/casos de uso en Itinerary y adaptadores. Documento formal sigue pendiente de integrar. |
+| Observabilidad | Parcial | Compose provisiona OpenTelemetry Collector, Prometheus, Grafana y Jaeger. No afirmar integración completa de telemetría de aplicaciones sin validar exportación y dashboards. |
+| Resiliencia | Parcial | Outbox, publicación con reintento y cola durable; no hay réplicas ni alta disponibilidad. Un contenedor detenido puede afectar la función que presta. |
 
-## Mapeo de fases
+## Evidencia local y comandos
 
-| Fase | Alcance | Criterio de cierre |
-| --- | --- | --- |
-| 1 | Compose, redes, volúmenes, health checks, observabilidad de plataforma | `docker compose ps` healthy + script de smoke |
-| 2–12 | Según prompt maestro | Código + tests + build + health + docs + esta matriz |
+### Compose y servicios
+
+```powershell
+docker compose up -d --build
+docker compose ps
+Invoke-RestMethod http://localhost:8000/health
+```
+
+El proceso local usa un Compose central. `docker compose down` conserva volúmenes; `docker compose down -v` elimina volúmenes y datos.
+
+### Prueba unitaria presente
+
+```powershell
+py -m pytest services/airport-service/test_airport_coords.py
+```
+
+### Prueba de carga Locust
+
+```powershell
+py -m pip install -r requirements-load.txt
+py -m locust -f performance/locustfile.py --host http://localhost:8000
+```
+
+Interfaz: `http://localhost:8089`. La ejecución observada de 10 usuarios no demuestra capacidad máxima del sistema.
+
+### SonarQube
+
+La instancia local se encontraba en `http://localhost:9000` y se ejecutó el scanner desde la carpeta del repositorio. No se debe subir el token. La pantalla de resultados y el log confirman un análisis exitoso anterior, con Quality Gate Passed y avisos de análisis. El intento reciente de agregar propiedades `-D` no fue aceptado por Pysonar, así que no se marca corregido.
+
+## GitHub verificado
+
+- `main` contiene la funcionalidad integrada hasta la modernización de tarjetas.
+- PR #1 (`docs/docker-only-startup`), #3 (`fix/edicion-itinerario`) y #4 (`feature/tarjetas-itinerarios`) están integrados.
+- PR #2 (`fix/handle-deleted-itinerary-while-editing`) se cerró sin integrarse; el cambio equivalente quedó en PR #3.
+- `feature/modernizacion-frontend` está publicada en GitHub con un commit que todavía no tiene PR.
+- Los archivos locales de Locust y esta documentación no se consideran en GitHub hasta quedar añadidos a un commit de rama y enviados.
+
+## Pendientes antes de afirmar cumplimiento total
+
+1. Incorporar el documento formal de arquitectura cuando el integrante lo termine.
+2. Confirmar con el tablero Jira el número real de iteraciones/sprints.
+3. Definir y agregar CI para pruebas/build en PR; implementar CD solo cuando exista un entorno de despliegue configurado.
+4. Acordar con el docente si “Docker Compose por cada servicio” exige varios manifiestos separados o si acepta un Compose central.
+5. Aumentar la suite unitaria fuente y automatizar su ejecución.
+6. Configurar importación de cobertura y corregir los avisos del scanner con propiedades persistentes verificadas.
+7. Completar y validar exportación de métricas/trazas desde los servicios al stack de observabilidad.
