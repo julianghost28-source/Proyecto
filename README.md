@@ -1,152 +1,150 @@
 # Sistema de Itinerarios Personales
 
-Plataforma de microservicios para consultar aeropuertos colombianos, diseñar itinerarios personales, notificar la creación de itinerarios de forma asíncrona y generar reportes bajo demanda.
+Aplicación web para consultar aeropuertos colombianos y crear, consultar, editar y eliminar itinerarios. El proyecto separa el catálogo de aeropuertos, la gestión de itinerarios y las notificaciones en servicios independientes. La ejecución que tenemos demostrada es local, con Docker Compose.
 
-## Estado actual
+## Qué funciona hoy
 
-La infraestructura, el Airport Service y el Itinerary Service se ejecutan con Docker Compose. Itinerary valida los aeropuertos mediante HTTP, persiste itinerarios en PostgreSQL y tiene CRUD documentado con Swagger. La publicación de eventos está implementada con Outbox transaccional y RabbitMQ; Notification Service consume esos eventos y guarda un historial en su propia base de datos.
+- Interfaz web con mapa y tarjetas de itinerarios, servida por Airport Service.
+- CRUD de itinerarios con FastAPI, validación de aeropuertos por HTTP y PostgreSQL.
+- Notificaciones simuladas procesadas de forma asíncrona mediante RabbitMQ.
+- Gateway Nginx que expone la aplicación y enruta las APIs por `http://localhost:8000`.
+- Prueba unitaria para normalizar coordenadas de aeropuertos.
+- Escenario de carga Locust en `performance/`; una ejecución local observada usó 10 usuarios y tuvo 0 solicitudes fallidas.
+- Análisis local SonarQube. La última pantalla revisada mostraba Quality Gate Passed, hallazgos abiertos y avisos de configuración.
 
-El mapa del Airport Service consume el modelo adaptado de aeropuertos y muestra sus ubicaciones. La interfaz de mapas usa Leaflet y OpenFreeMap.
-
-El entorno local incluye:
-
-| Componente | Rol | Persistencia / UI |
-| --- | --- | --- |
-| `postgres-airport` | Base del bounded context Aeropuertos | volumen `airport_pg_data` (no expuesta al host) |
-| `postgres-itinerary` | Base del bounded context Itinerarios | volumen `itinerary_pg_data` |
-| `postgres-notification` | Base del bounded context Notificaciones | volumen `notification_pg_data` |
-| `redis` | Caché (Aeropuertos, Fase 2) | volumen `redis_data` |
-| `rabbitmq` | Broker de `ItineraryCreatedEvent` | UI `http://127.0.0.1:15672` |
-| `airport-service` | Adaptador REST de aeropuertos colombianos | API y Swagger `http://127.0.0.1:8010/docs` |
-| `itinerary-service` | CRUD, validación HTTP y Outbox transaccional | API y Swagger `http://127.0.0.1:8002/docs` |
-| `notification-service` | Consumidor de eventos e historial de notificaciones simuladas | API y Swagger `http://127.0.0.1:8003/docs` |
-| `gateway` | Entrada HTTP única con proxy y limitación básica de solicitudes | `http://127.0.0.1:8000` |
-| `jaeger` | Trazas | UI `http://127.0.0.1:16686` |
-| `otel-collector` | Recepción OTLP y exportación | interno |
-| `prometheus` | Métricas | `http://127.0.0.1:9090` |
-| `grafana` | Dashboards | `http://127.0.0.1:3000` |
-
-Red Docker: `personal-itinerary-net`.
-
-## Arquitectura actual y objetivo
+## Arquitectura actual
 
 ```text
-Usuario → Frontend → API Gateway
-                      ├─ Airport Service → API Colombia
-                      │                    Redis (caché)
-                      │                    PostgreSQL airport_db
-                      └─ Itinerary Service → PostgreSQL itinerary_db
-                                             ↓ ItineraryCreatedEvent
-                                             ↓ (Outbox en la transacción)
-                                           RabbitMQ
-                                             ↓
-                                      Notification Service
-                                             ↓
-                                      PostgreSQL notification_db
+Navegador
+   │ HTTP
+   ▼
+Gateway Nginx :8000 ───────► Airport Service :8010 ─────► API Colombia
+   │                         └─ entrega la interfaz web
+   ├───────────────────────► Itinerary Service :8002 ─────► PostgreSQL itinerary
+   │                                                     └─ Outbox → RabbitMQ
+   └───────────────────────► Notification Service :8003 ◄── RabbitMQ
+                                                         └─ PostgreSQL notification
 
-Observabilidad: OpenTelemetry → Collector → Jaeger / Prometheus → Grafana
+Compose también levanta las bases auxiliares, Redis y el stack de observabilidad.
+SonarQube se ejecuta aparte del Compose principal.
 ```
 
-## Requisitos
+Los tres servicios de aplicación tienen sus propios Dockerfile. Hay **un solo `docker-compose.yml` central** para levantar el entorno; no hay un Compose independiente por servicio.
 
-- Docker Desktop en Windows, con el motor iniciado y WSL 2 habilitado; o Docker Engine con Docker Compose v2 en Linux/macOS.
-- Git para clonar el repositorio.
+| Servicio / componente | Función actual | Dirección local |
+| --- | --- | --- |
+| Gateway | Entrada web y proxy Nginx | [http://localhost:8000](http://localhost:8000) |
+| Airport Service | Interfaz, catálogo de aeropuertos y adaptación del JSON externo | [http://localhost:8010](http://localhost:8010) |
+| Itinerary Service | CRUD, reglas de negocio, PostgreSQL y Outbox | [http://localhost:8002/docs](http://localhost:8002/docs) |
+| Notification Service | Consume eventos y guarda avisos simulados | [http://localhost:8003/docs](http://localhost:8003/docs) |
+| RabbitMQ Management | Estado del broker y colas | [http://localhost:15672](http://localhost:15672) |
+| Prometheus | Consulta de métricas scrapeadas | [http://localhost:9090](http://localhost:9090) |
+| Grafana | Visualización de métricas | [http://localhost:3000](http://localhost:3000) |
+| Jaeger | Interfaz para trazas recibidas | [http://localhost:16686](http://localhost:16686) |
+| SonarQube | Análisis estático local; contenedor separado | [http://localhost:9000](http://localhost:9000) |
+| Locust | Pantalla de la prueba de carga; proceso local | [http://localhost:8089](http://localhost:8089) |
 
-Todos los servicios de la aplicación se ejecutan con Docker Compose. No es necesario instalar Python, PostgreSQL, Redis, RabbitMQ, Jaeger, Prometheus ni Grafana en el computador.
+Las rutas de aeropuertos existen, pero algunas no están incluidas en el esquema OpenAPI de Airport Service. Para el CRUD de itinerarios usa su Swagger en el puerto 8002.
 
-## Iniciar el proyecto
+## Iniciar con Docker Compose
 
-En Windows, abre Docker Desktop y espera a que indique que está funcionando. Después, en PowerShell:
+Requisitos: Docker Desktop con el motor activo y Git. En PowerShell, desde la raíz:
 
 ```powershell
-git clone https://github.com/julianghost28-source/Proyecto.git
-cd Proyecto
-Copy-Item .env.example .env
+Copy-Item .env.example .env   # solo la primera vez
+# Completa .env con valores locales propios y nunca lo subas a GitHub.
 docker compose up -d --build
 docker compose ps
 ```
 
-La primera vez, Docker descarga las imágenes y construye los servicios; puede tardar unos minutos. Cuando ya está instalado y no cambiaste el código, inicia el entorno con:
+Cuando ya construiste las imágenes y no cambiaste código:
 
 ```powershell
 docker compose up -d
 docker compose ps
 ```
 
-La aplicación principal queda en [http://localhost:8000](http://localhost:8000). Verifica que los servicios principales aparezcan como `healthy` en `docker compose ps` antes de usarla.
-
-### Direcciones locales
-
-- Aplicación y Gateway: http://localhost:8000
-- API de aeropuertos: http://localhost:8010/docs
-- API de itinerarios: http://localhost:8002/docs
-- API de notificaciones: http://localhost:8003/docs
-- RabbitMQ Management: http://localhost:15672
-- Jaeger: http://localhost:16686
-- Prometheus: http://localhost:9090
-- Grafana: http://localhost:3000
-
-Las bases de datos y Redis se mantienen dentro de la red de Docker Compose; no se publican directamente al computador.
-
-### Detener el proyecto
-
-Para apagar los contenedores sin borrar los datos guardados:
+Abre [http://localhost:8000](http://localhost:8000). Los datos de PostgreSQL se conservan en volúmenes si detienes el entorno con:
 
 ```powershell
 docker compose down
 ```
 
-Los datos se conservan en volúmenes de Docker. No uses `docker compose down -v` a menos que quieras borrar esos datos.
+`docker compose down -v` también elimina los volúmenes y sus datos. Úsalo solo si realmente quieres reiniciar la información.
 
-## Credenciales de desarrollo
+## Endpoints principales
 
-Definidas en `.env` / `.env.example`. Son valores **solo locales**, no de producción.
+| Método | Ruta | Propósito | Respuesta habitual |
+| --- | --- | --- | --- |
+| GET | `/api/itineraries` | Listar itinerarios | 200 |
+| POST | `/api/itineraries` | Crear un itinerario | 201 |
+| GET | `/api/itineraries/{itinerary_id}` | Consultar uno por ID entero | 200 / 404 |
+| PATCH | `/api/itineraries/{itinerary_id}` | Actualizar campos enviados | 200 / 404 |
+| DELETE | `/api/itineraries/{itinerary_id}` | Eliminar por ID | 204 / 404 |
+| GET | `/api/airports` | Listar aeropuertos | 200 |
+| GET | `/api/notifications` | Listar notificaciones simuladas | 200 |
+| GET | `/health` | Comprobar salud del servicio | 200 |
 
-- Grafana: `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD`
-- RabbitMQ management: `RABBITMQ_USER` / `RABBITMQ_PASSWORD`
-- Redis y PostgreSQL no se publican en el host; los servicios de aplicación (Fase 2+) los usan por nombre DNS interno.
+El Gateway enruta las APIs al servicio correspondiente. Itinerary valida que origen y destino sean distintos, que existan y que la duración sea positiva. `PATCH` conserva los campos que no se envían.
 
-## Topología de eventos (predeclarada)
+## Prueba unitaria
 
-| Recurso | Nombre |
-| --- | --- |
-| Exchange | `itinerary.events` (topic) |
-| Routing key | `itinerary.created` |
-| Cola | `notification.itinerary-created` |
-| DLX / DLQ | `itinerary.events.dlx` / `notification.itinerary-created.dlq` |
+La prueba fuente que está actualmente en el repositorio es [`services/airport-service/test_airport_coords.py`](services/airport-service/test_airport_coords.py). Comprueba una regla pequeña de `normalize_airport`: si API Colombia entrega latitud y longitud invertidas, el servicio las corrige. Es un test unitario; no prueba la base de datos, RabbitMQ ni todo el navegador.
 
-Definición versionada en `infra/rabbitmq/definitions.json`.
+Con las dependencias de Python disponibles, se ejecuta desde la raíz:
 
-El contrato `ItineraryCreatedEvent` está documentado en [docs/asyncapi.yaml](docs/asyncapi.yaml). El Outbox se guarda en la misma transacción que el itinerario; el publicador reintenta si RabbitMQ no está disponible. Notification Service deduplica por `event_id` y registra una notificación simulada, sin enviar correos reales.
-
-## Documentación relacionada
-
-- [SECURITY.md](SECURITY.md)
-- [REQUIREMENTS_TRACEABILITY.md](REQUIREMENTS_TRACEABILITY.md)
-- Reglas de Cursor: `.cursor/rules/project.mdc`
-
-## Fases
-
-1. Infraestructura (este documento, Compose)
-2. Airport Service
-3. Itinerary Service
-4. Eventos
-5. Notification Worker
-6. API Gateway
-7. Frontend
-8. Report Function
-9. Seguridad
-10. Observabilidad de aplicación
-11. Pruebas E2E
-12. CI/CD
-
-## Comando de portabilidad
-
-En cualquier máquina:
-
-```text
-git clone <repo>
-docker compose up --build
+```powershell
+py -m pytest services/airport-service/test_airport_coords.py
 ```
 
-El stack de infraestructura debe quedar healthy sin instalaciones manuales de dependencias de runtime.
+Esta rama no contiene ahora mismo la suite amplia de 18 casos mencionada en una guía anterior. No presentes esa cifra como resultado de esta rama.
+
+## Prueba de carga con Locust
+
+El escenario está en [`performance/locustfile.py`](performance/locustfile.py). Usa el Gateway, lee aeropuertos e itinerarios, consulta `/health` y crea ocasionalmente itinerarios. Los `POST` exitosos escriben datos persistentes y producen los eventos normales de la aplicación. Úsalo solo contra el entorno local, nunca contra producción.
+
+Instalación y arranque:
+
+```powershell
+py -m pip install -r requirements-load.txt
+py -m locust -f performance/locustfile.py --host http://localhost:8000
+```
+
+Abre [http://localhost:8089](http://localhost:8089). Para una demo pequeña, configura 10 usuarios y una tasa de subida de 1 usuario por segundo; detén la prueba con **STOP**. Revisa las estadísticas por endpoint, no solo el total. Consulta [`performance/README.md`](performance/README.md) para ver el significado y los efectos sobre los datos.
+
+Evidencia observada durante la demo: 10 usuarios virtuales, 96 solicitudes, 0 fallos y cerca de 4,5 solicitudes por segundo. Es una medición en un computador local, no una capacidad máxima garantizada ni un SLA.
+
+## SonarQube
+
+La aplicación se analizó localmente con `pysonar` contra `http://localhost:9000`. La última página revisada indicó **Quality Gate: Passed**, 4 hallazgos de seguridad, 2 de confiabilidad y 2 de mantenibilidad, cobertura 0 % y duplicación 1,5 %. También mostró avisos de versión objetivo de Python y de configuración de pruebas. Un intento posterior de pasar opciones `-D` a Pysonar terminó con `Unexpected argument`; por tanto esos ajustes no están confirmados.
+
+SonarQube revisa código estáticamente; no ejecuta pytest ni es CI/CD. Su contenedor está separado del `docker-compose.yml` principal. No guardes tokens en este repositorio, archivos, capturas ni commits.
+
+## Mensajería y persistencia
+
+Itinerary Service guarda el itinerario y el evento pendiente en una misma transacción (Outbox). Un publicador envía `ItineraryCreatedEvent` a RabbitMQ; Notification Service consume el evento y guarda una notificación simulada en su propia base. RabbitMQ transporta mensajes: no es la base de datos de itinerarios ni escribe directamente en PostgreSQL.
+
+Las bases PostgreSQL de Itinerary y Notification se usan. La base `postgres-airport` y Redis aparecen configurados en Compose, pero el flujo visible del catálogo no está conectado a esos servicios actualmente.
+
+## Calidad, despliegue y límites confirmados
+
+- El despliegue presentado es local en Docker Compose; no está publicado en Azure ni en Internet.
+- No hay workflow de GitHub Actions en `.github/workflows`; build, pruebas, SonarQube y carga se ejecutan manualmente.
+- La observabilidad está parcialmente conectada: Compose provisiona Collector, Prometheus, Grafana y Jaeger, pero no afirmes que todas las aplicaciones exportan trazas o métricas a todos ellos sin comprobarlo.
+- La arquitectura hexagonal se aprecia con más claridad en Itinerary Service; los tres servicios no tienen la misma separación por capas.
+- Airport Service adapta el JSON externo mediante `normalize_airport`; el traductor está en `main.py`, no en una clase separada llamada `ApiColombiaAirportAdapter`.
+- La rúbrica pide revisar si requiere un `docker-compose.yml` por servicio. El proyecto actual usa un Compose central y un Dockerfile por servicio de aplicación.
+- El documento corto de arquitectura y el conteo real de sprints deben verificarse con el equipo/aula/Jira antes de presentarlos.
+
+## Git y solicitudes de extracción
+
+El repositorio es [julianghost28-source/Proyecto](https://github.com/julianghost28-source/Proyecto). Se usan nombres descriptivos con prefijos `feature/`, `fix/` y `docs/`. Una rama contiene una tarea; un pull request (PR) permite revisar el diff antes de integrar a `main`.
+
+Historial verificado: PR #1 (Docker-only startup), #3 (edición de itinerario eliminado) y #4 (tarjetas del frontend) se integraron; PR #2 se cerró sin integrar por duplicar la corrección del #3. La rama de modernización de frontend tiene el PR #5 abierto hacia `main`. El PR #5 incluye Locust, el README actualizado y el guion de exposición. Está publicado para revisión, pero aún no se ha integrado a `main`.
+
+## Documentos
+
+- [Guion para exponer en tres partes](docs/guion_sustentacion_tres_integrantes.md)
+- [Trazabilidad de la rúbrica y estado real](REQUIREMENTS_TRACEABILITY.md)
+- [Guía de Locust](performance/README.md)
+- [Contrato de eventos](docs/asyncapi.yaml)
