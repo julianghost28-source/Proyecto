@@ -10,7 +10,7 @@ Esta matriz refleja el código y las ejecuciones observadas en la rama local `fe
 | Patrón Adapter | Implementación visible, estructura parcial | `HttpAirportCatalog` adapta la consulta HTTP detrás del puerto. `normalize_airport` transforma el JSON de API Colombia, pero vive en `services/airport-service/main.py` y no en una clase adaptadora separada. |
 | Jira / backlog / iteraciones | Verificar con el tablero | No se puede confirmar desde el repositorio cuántos sprints/iteraciones hay. Las 12 fases del README anterior no son un conteo de iteraciones. |
 | Ramas y commits | Implementado | Hay ramas `feature/`, `fix/` y `docs/`; conservar `main` para integrar trabajo revisado. |
-| Pull requests | Implementado como flujo | PR #1, #3 y #4 integrados; PR #2 cerrado sin merge por duplicidad. La rama `feature/modernizacion-frontend` todavía no tiene PR. |
+| Pull requests | Implementado como flujo | PR #1, #3 y #4 integrados; PR #2 cerrado sin merge por duplicidad. PR #5 de `feature/modernizacion-frontend` está abierto hacia `main`, pendiente de revisión/merge. |
 | Pruebas unitarias | Parcial | Esta rama contiene el test fuente `services/airport-service/test_airport_coords.py` para normalización de coordenadas. No contiene la suite de 18 casos mencionada en un documento anterior. |
 | Pruebas de carga | Ejemplo local implementado y ejecutado | `performance/locustfile.py`; ejecución observada con 10 usuarios, 96 requests y 0 fallos. Los POST crean datos persistentes; cifras son de una prueba local puntual. |
 | Swagger / OpenAPI | Implementado parcialmente | Swagger de Itinerary en `http://localhost:8002/docs`, Notification en `http://localhost:8003/docs`. Algunas rutas de Airport se excluyen del esquema OpenAPI. |
@@ -59,8 +59,8 @@ La instancia local se encontraba en `http://localhost:9000` y se ejecutó el sca
 - `main` contiene la funcionalidad integrada hasta la modernización de tarjetas.
 - PR #1 (`docs/docker-only-startup`), #3 (`fix/edicion-itinerario`) y #4 (`feature/tarjetas-itinerarios`) están integrados.
 - PR #2 (`fix/handle-deleted-itinerary-while-editing`) se cerró sin integrarse; el cambio equivalente quedó en PR #3.
-- `feature/modernizacion-frontend` está publicada en GitHub con un commit que todavía no tiene PR.
-- Los archivos de Locust y esta documentación ya están en la rama del PR #5 y visibles para revisión; todavía no forman parte de `main`.
+- `feature/modernizacion-frontend` está publicada en GitHub y tiene abierto el PR #5 hacia `main`.
+- Los archivos de Locust y la documentación de exposición están en esa rama; deben subirse los cambios de esta actualización para que aparezcan en el diff del PR. Todavía no forman parte de `main`.
 
 ## Pendientes antes de afirmar cumplimiento total
 
