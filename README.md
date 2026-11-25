@@ -8,7 +8,7 @@ Aplicación web para consultar aeropuertos colombianos y crear, consultar, edita
 - CRUD de itinerarios con FastAPI, validación de aeropuertos por HTTP y PostgreSQL.
 - Notificaciones simuladas procesadas de forma asíncrona mediante RabbitMQ.
 - Gateway Nginx que expone la aplicación y enruta las APIs por `http://localhost:8000`.
-- Prueba unitaria para normalizar coordenadas de aeropuertos.
+- Pruebas unitarias para normalizar coordenadas y validar los casos de uso del CRUD de itinerarios.
 - Escenario de carga Locust en `performance/`; una ejecución local observada usó 10 usuarios y tuvo 0 solicitudes fallidas.
 - Análisis local SonarQube. La última pantalla revisada mostraba Quality Gate Passed, hallazgos abiertos y avisos de configuración.
 
@@ -87,17 +87,16 @@ docker compose down
 
 El Gateway enruta las APIs al servicio correspondiente. Itinerary valida que origen y destino sean distintos, que existan y que la duración sea positiva. `PATCH` conserva los campos que no se envían.
 
-## Prueba unitaria
+## Pruebas unitarias
 
-La prueba fuente que está actualmente en el repositorio es [`services/airport-service/test_airport_coords.py`](services/airport-service/test_airport_coords.py). Comprueba una regla pequeña de `normalize_airport`: si API Colombia entrega latitud y longitud invertidas, el servicio las corrige. Es un test unitario; no prueba la base de datos, RabbitMQ ni todo el navegador.
+La suite actual contiene 10 pruebas: una comprueba la normalización de coordenadas de aeropuertos y nueve prueban la lógica de los casos de uso del CRUD de itinerarios (listar, crear, consultar, editar y eliminar), incluyendo validaciones. Estas pruebas llaman la lógica de aplicación con repositorio y catálogo en memoria: no hacen clic en el navegador ni modifican PostgreSQL o RabbitMQ.
 
-Con las dependencias de Python disponibles, se ejecuta desde la raíz:
+Instala las dependencias de prueba una vez y ejecuta toda la suite desde la raíz:
 
 ```powershell
-py -m pytest services/airport-service/test_airport_coords.py
+py -m pip install -r requirements-test.txt
+py -m pytest
 ```
-
-Esta rama no contiene ahora mismo la suite amplia de 18 casos mencionada en una guía anterior. No presentes esa cifra como resultado de esta rama.
 
 ## Prueba de carga con Locust
 
