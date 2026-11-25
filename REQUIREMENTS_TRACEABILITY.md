@@ -11,7 +11,7 @@ Esta matriz refleja el código y las ejecuciones observadas en la rama local `fe
 | Jira / backlog / iteraciones | Verificar con el tablero | No se puede confirmar desde el repositorio cuántos sprints/iteraciones hay. Las 12 fases del README anterior no son un conteo de iteraciones. |
 | Ramas y commits | Implementado | Hay ramas `feature/`, `fix/` y `docs/`; conservar `main` para integrar trabajo revisado. |
 | Pull requests | Implementado como flujo | PR #1, #3 y #4 integrados; PR #2 cerrado sin merge por duplicidad. PR #5 de `feature/modernizacion-frontend` está abierto hacia `main`, pendiente de revisión/merge. |
-| Pruebas unitarias | Parcial | Esta rama contiene el test fuente `services/airport-service/test_airport_coords.py` para normalización de coordenadas. No contiene la suite de 18 casos mencionada en un documento anterior. |
+| Pruebas unitarias | Parcial | 10 pruebas fuente: una de normalización de coordenadas y nueve de casos de uso CRUD de itinerarios con dependencias en memoria. No son pruebas de navegador, PostgreSQL ni RabbitMQ. Ejecutar `py -m pytest`. |
 | Pruebas de carga | Ejemplo local implementado y ejecutado | `performance/locustfile.py`; ejecución observada con 10 usuarios, 96 requests y 0 fallos. Los POST crean datos persistentes; cifras son de una prueba local puntual. |
 | Swagger / OpenAPI | Implementado parcialmente | Swagger de Itinerary en `http://localhost:8002/docs`, Notification en `http://localhost:8003/docs`. Algunas rutas de Airport se excluyen del esquema OpenAPI. |
 | SonarQube | Análisis manual local | Último dashboard revisado: Quality Gate Passed, hallazgos abiertos, cobertura 0 % y avisos. Configuración adicional de `sonar.python.version`/`sonar.tests` no quedó aplicada: Pysonar rechazó los argumentos `-D` usados. |
@@ -35,10 +35,11 @@ Invoke-RestMethod http://localhost:8000/health
 
 El proceso local usa un Compose central. `docker compose down` conserva volúmenes; `docker compose down -v` elimina volúmenes y datos.
 
-### Prueba unitaria presente
+### Pruebas unitarias presentes
 
 ```powershell
-py -m pytest services/airport-service/test_airport_coords.py
+py -m pip install -r requirements-test.txt
+py -m pytest
 ```
 
 ### Prueba de carga Locust
@@ -68,6 +69,6 @@ La instancia local se encontraba en `http://localhost:9000` y se ejecutó el sca
 2. Confirmar con el tablero Jira el número real de iteraciones/sprints.
 3. Definir y agregar CI para pruebas/build en PR; implementar CD solo cuando exista un entorno de despliegue configurado.
 4. Acordar con el docente si “Docker Compose por cada servicio” exige varios manifiestos separados o si acepta un Compose central.
-5. Aumentar la suite unitaria fuente y automatizar su ejecución.
+5. Añadir pruebas de integración de API/DB/eventos y automatizar las pruebas unitarias en CI.
 6. Configurar importación de cobertura y corregir los avisos del scanner con propiedades persistentes verificadas.
 7. Completar y validar exportación de métricas/trazas desde los servicios al stack de observabilidad.

@@ -458,15 +458,16 @@ docker compose down
 
 Una prueba **unitaria** revisa una unidad pequeña de código de forma aislada. Una prueba **de integración** comprueba interacción entre componentes reales, por ejemplo, API + PostgreSQL o productor + RabbitMQ + consumidor. Un `GET` manual desde Swagger comprueba una llamada y su respuesta, pero no es por sí solo una suite automatizada.
 
-En el código fuente actual hay un test rastreado: `services/airport-service/test_airport_coords.py`, que verifica la normalización/intercambio correcto de latitud y longitud. Esta cobertura es parcial: no hay evidencia en los archivos fuente de una suite automatizada completa para CRUD, PostgreSQL, Outbox y RabbitMQ. Tampoco se debe repetir el dato antiguo de “18 pruebas”; no corresponde al test fuente revisado.
+La suite actual tiene 10 pruebas fuente: una verifica la normalización de latitud/longitud en `services/airport-service/test_airport_coords.py`, y nueve verifican casos de uso de itinerarios en `services/itinerary-service/test_itinerary_service.py`: listar, crear, consultar, actualizar y eliminar, además de validaciones y registros inexistentes. Para aislar la lógica, estas nueve usan repositorio y catálogo falsos en memoria. No simulan clics de navegador ni prueban PostgreSQL, RabbitMQ o las rutas HTTP reales. Por eso la cobertura de pruebas es parcial.
 
 Comando desde la raíz:
 
 ```powershell
-py -m pytest services/airport-service/test_airport_coords.py
+py -m pip install -r requirements-test.txt
+py -m pytest
 ```
 
-El resultado de pytest indica las pruebas recolectadas, cuántas pasaron/fallaron y el código de salida. Ejecuten el comando antes de exponer si quieren mostrar una salida actual; este documento no afirma una ejecución hecha ahora. La versión de pytest no está fijada en las dependencias del proyecto; no inventar una versión exacta.
+La ejecución local del 25 de noviembre de 2026 recolectó 10 pruebas y las 10 pasaron. Al volver a ejecutar, el resultado puede cambiar si el código o el entorno cambian.
 
 **Distinción para el profesor:** Locust genera solicitudes concurrentes de carga; no prueba una función de forma aislada. SonarQube analiza código estático; no ejecuta las pruebas. Swagger permite llamadas manuales; no produce por sí solo un reporte de pytest.
 
@@ -532,7 +533,7 @@ En una demostración controlada se puede parar **solo** Notification Service (`d
 | Planning / backlog Jira | Debe confirmarse en Jira | Tablero/sprints del equipo, no demostrable solo con repo | Mostrar backlog e iteraciones reales |
 | Repositorio Git y ramas estándar | Implementado | Repo, ramas `feature/`, `fix/`, `docs/` | Mostrar branch list e historial |
 | Pull Request | Implementado como flujo; PR #5 abierto | PR #1/#3/#4 integrados; #5 aún sin merge | Mostrar diff y estado verdadero del PR |
-| Pruebas unitarias | Parcial: un test fuente visible | `services/airport-service/test_airport_coords.py` | Ejecutar pytest y explicar qué valida; no llamar suite completa |
+| Pruebas unitarias | Parcial: 10 pruebas (1 coordenadas + 9 casos de uso CRUD) | `services/airport-service/test_airport_coords.py`, `services/itinerary-service/test_itinerary_service.py` | Ejecutar `py -m pytest`; explicar que usa dependencias en memoria, no clics reales ni PostgreSQL/RabbitMQ |
 | Pruebas de integración | Pendiente/no demostradas como suite automatizada | No se identificó una suite fuente de integración | Mostrar flujo manual o reconocer pendiente |
 | Pruebas de carga | Escenario Locust local ejecutado | `performance/locustfile.py`; captura con 10 usuarios, 96 requests, 0 fallas | Mostrar Statistics/Charts y aclarar límites de entorno |
 | Swagger/OpenAPI | Implementado parcialmente | Itinerary `:8002/docs`, Notification `:8003/docs`; rutas Airport ocultas del schema | Ejecutar una operación y explicar códigos |
@@ -615,7 +616,7 @@ En una demostración controlada se puede parar **solo** Notification Service (`d
 
 ### ¿Hicieron pruebas unitarias?
 
-“Tenemos un test fuente para normalización de coordenadas de aeropuerto y se ejecuta con Pytest. Es cobertura puntual, todavía no una suite extensa por servicio.”
+“Tenemos 10 pruebas unitarias en total. Una revisa que las coordenadas del proveedor de aeropuertos se normalicen correctamente. Las otras nueve revisan la lógica de listar, crear, consultar, editar y eliminar itinerarios, además de algunos errores de validación. Para ejecutarlas usamos `py -m pytest`. No simulan clics en la página ni se conectan a PostgreSQL o RabbitMQ: usan dependencias falsas en memoria para revisar la lógica aislada.”
 
 ### ¿Hicieron pruebas de integración?
 
@@ -688,7 +689,8 @@ En una demostración controlada se puede parar **solo** Notification Service (`d
 | Logs de un servicio | `docker compose logs -f itinerary-service` |
 | Iniciar/reconstruir entorno | `docker compose up -d --build` |
 | Detener y conservar volúmenes | `docker compose down` |
-| Test unitario fuente actual | `py -m pytest services/airport-service/test_airport_coords.py` |
+| Instalar dependencias de pruebas | `py -m pip install -r requirements-test.txt` |
+| Suite de pruebas unitarias | `py -m pytest` |
 | Locust | `py -m locust -f performance/locustfile.py --host http://localhost:8000` |
 
 **Antes de presentar:** confirmar en Jira el número de iteraciones; revisar en vivo el estado del PR #5; actualizar las capturas si el dashboard de Sonar o la ejecución de Locust cambiaron; no mostrar secretos; describir como pendientes las integraciones parciales.

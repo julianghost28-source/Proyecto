@@ -1,0 +1,2 @@
+-e ./packages/pis-platform
+pytest>=9,<10
